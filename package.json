@@ -10,8 +10,7 @@
     "build": "npm run build:commonjs && npm run build:umd && npm run build:umd:min",
     "build:commonjs": "tsc -p tsconfig2.json",
     "build:umd": "webpack --config webpack_build.config.js",
-    "build:umd:min": "webpack -p --config webpack_build_min.config.js",
-    "doc": "typedoc --out typedoc --mode file --exclude \"**/examples/**/*.tsx\"  --readme none "
+    "build:umd:min": "webpack -p --config webpack_build_min.config.js"
   },
   "author": "Caplin Systems Ltd",
   "repository": "https://github.com/caplin/FlexLayout",
@@ -21,19 +20,16 @@
     "react-dom": "^16.4.2"
   },
   "devDependencies": {
-    "@types/jasmine": "^2.8.8",
-    "@types/react": "^16.4.9",
-    "@types/react-dom": "^16.0.7",
-    "awesome-typescript-loader": "^5.2.0",
-    "jasmine": "^3.2.0",
-    "react": "^16.4.2",
-    "react-dom": "^16.4.2",
-    "source-map-loader": "^0.2.3",
-    "typedoc": "^0.11.1",
-    "typescript": "^3.0.0",
-    "webpack": "^4.16.5",
-    "webpack-cli": "^3.1.0",
-    "webpack-dev-server": "^3.1.5"
+    "@types/react": "^16.8.3",
+    "@types/react-dom": "^16.8.2",
+    "awesome-typescript-loader": "^5.2.1",
+    "react": "^16.8.2",
+    "react-dom": "^16.8.2",
+    "source-map-loader": "^0.2.4",
+    "typescript": "^3.3.3",
+    "webpack": "^4.29.4",
+    "webpack-cli": "^3.2.3",
+    "webpack-dev-server": "^3.1.14"
   },
   "dependencies": {}
 }

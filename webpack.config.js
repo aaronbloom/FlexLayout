@@ -2,8 +2,7 @@
 module.exports = {
 	mode: 'development',
 	entry: {
-		demo: "./examples/simple/main.tsx",
-		tests: "./spec/main.ts"
+		demo: "./examples/simple/main.tsx"
 	},
 
 	output: {
