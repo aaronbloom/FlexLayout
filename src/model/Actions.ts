@@ -1,4 +1,4 @@
-import DockLocation from "../DockLocation";
+import { DockLocation } from "../DockLocation";
 import Action from "./Action";
 
 /**
@@ -27,7 +27,7 @@ class Actions {
      * @returns {{type: (string|string), json: *, toNode: *, location: (*|string), index: *}}
      */
     static addNode(json: any, toNodeId: string, location: DockLocation, index: number): Action {
-        return new Action(Actions.ADD_NODE, { json: json, toNode: toNodeId, location: location.getName(), index: index });
+        return new Action(Actions.ADD_NODE, { json: json, toNode: toNodeId, location: location.name, index: index });
     }
 
     /**
@@ -42,7 +42,7 @@ class Actions {
         return new Action(Actions.MOVE_NODE, {
             fromNode: fromNodeId,
             toNode: toNodeId,
-            location: location.getName(),
+            location: location.name,
             index: index
         });
     }

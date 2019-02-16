@@ -1,130 +1,136 @@
 import Rect from "./Rect";
 import Orientation from "./Orientation";
-import { JSMap } from "./Types";
 
-class DockLocation {
+export type DockLocationType =
+    "top" |
+    "bottom" |
+    "left" |
+    "right" |
+    "center";
 
-    static values: JSMap<DockLocation> = {};
-    static TOP = new DockLocation("top", Orientation.VERT, 0);
-    static BOTTOM = new DockLocation("bottom", Orientation.VERT, 1);
-    static LEFT = new DockLocation("left", Orientation.HORZ, 0);
-    static RIGHT = new DockLocation("right", Orientation.HORZ, 1);
-    static CENTER = new DockLocation("center", Orientation.VERT, 0);
+export interface DockLocation {
+    readonly name: DockLocationType;
+    readonly orientation: Orientation;
+    readonly indexPlus: number;
+}
 
-    /** @hidden @internal */
-    _name: string;
-    /** @hidden @internal */
-    _orientation: Orientation;
-    /** @hidden @internal */
-    _indexPlus: number;
+export const TOP: DockLocation = {
+    name: "top",
+    orientation: Orientation.VERT,
+    indexPlus: 0
+};
 
-    /** @hidden @internal */
-    constructor(name: string, orientation: Orientation, indexPlus: number) {
-        this._name = name;
-        this._orientation = orientation;
-        this._indexPlus = indexPlus;
-        DockLocation.values[this._name] = this;
+export const BOTTOM: DockLocation = {
+    name: "bottom",
+    orientation: Orientation.VERT,
+    indexPlus: 1
+};
+
+export const LEFT: DockLocation = {
+    name: "left",
+    orientation: Orientation.HORZ,
+    indexPlus: 0
+};
+
+export const RIGHT: DockLocation = {
+    name: "right",
+    orientation: Orientation.HORZ,
+    indexPlus: 1
+};
+
+export const CENTER: DockLocation = {
+    name: "center",
+    orientation: Orientation.VERT,
+    indexPlus: 0
+};
+
+
+export const DockLocations: Record<DockLocationType, DockLocation> = {
+    top: TOP,
+    bottom: BOTTOM,
+    left: LEFT,
+    right: RIGHT,
+    center: CENTER
+};
+
+export const getByName = (name: DockLocationType): DockLocation => {
+    return DockLocations[name];
+}
+
+/** @hidden @internal */
+export const getLocation = (rect: Rect, x: number, y: number): DockLocation => {
+    if (x < rect.x + rect.width / 4) {
+        return LEFT;
     }
-
-    getName() {
-        return this._name;
+    else if (x > rect.getRight() - rect.width / 4) {
+        return RIGHT;
     }
-
-    getOrientation() {
-        return this._orientation;
+    else if (y < rect.y + rect.height / 4) {
+        return TOP;
     }
-
-    /** @hidden @internal */
-    static getByName(name: string): DockLocation {
-        return DockLocation.values[name];
+    else if (y > rect.getBottom() - rect.height / 4) {
+        return BOTTOM;
     }
-
-    /** @hidden @internal */
-    static getLocation(rect: Rect, x: number, y: number) {
-        if (x < rect.x + rect.width / 4) {
-            return DockLocation.LEFT;
-        }
-
-        else if (x > rect.getRight() - rect.width / 4) {
-            return DockLocation.RIGHT;
-        }
-
-        else if (y < rect.y + rect.height / 4) {
-            return DockLocation.TOP;
-        }
-
-        else if (y > rect.getBottom() - rect.height / 4) {
-            return DockLocation.BOTTOM;
-        }
-        else {
-            return DockLocation.CENTER;
-        }
-    }
-
-    /** @hidden @internal */
-    getDockRect(r: Rect) {
-        if (this === DockLocation.TOP) {
-            return new Rect(r.x, r.y, r.width, r.height / 2);
-        }
-        else if (this === DockLocation.BOTTOM) {
-            return new Rect(r.x, r.getBottom() - r.height / 2, r.width, r.height / 2);
-        }
-        if (this === DockLocation.LEFT) {
-            return new Rect(r.x, r.y, r.width / 2, r.height);
-        }
-        else if (this === DockLocation.RIGHT) {
-            return new Rect(r.getRight() - r.width / 2, r.y, r.width / 2, r.height);
-        }
-        else {
-            return r.clone();
-        }
-    }
-
-    /** @hidden @internal */
-    split(rect: Rect, size: number) {
-        if (this === DockLocation.TOP) {
-            let r1 = new Rect(rect.x, rect.y, rect.width, size);
-            let r2 = new Rect(rect.x, rect.y + size, rect.width, rect.height - size);
-            return { start: r1, end: r2 };
-        }
-        else if (this === DockLocation.LEFT) {
-            let r1 = new Rect(rect.x, rect.y, size, rect.height);
-            let r2 = new Rect(rect.x + size, rect.y, rect.width - size, rect.height);
-            return { start: r1, end: r2 };
-        }
-        if (this === DockLocation.RIGHT) {
-            let r1 = new Rect(rect.getRight() - size, rect.y, size, rect.height);
-            let r2 = new Rect(rect.x, rect.y, rect.width - size, rect.height);
-            return { start: r1, end: r2 };
-        }
-        else {//if (this === DockLocation.BOTTOM) {
-            let r1 = new Rect(rect.x, rect.getBottom() - size, rect.width, size);
-            let r2 = new Rect(rect.x, rect.y, rect.width, rect.height - size);
-            return { start: r1, end: r2 };
-        }
-    }
-
-    /** @hidden @internal */
-    reflect() {
-        if (this === DockLocation.TOP) {
-            return DockLocation.BOTTOM
-        }
-        else if (this === DockLocation.LEFT) {
-            return DockLocation.RIGHT
-        }
-        if (this === DockLocation.RIGHT) {
-            return DockLocation.LEFT
-        }
-        else { //if (this === DockLocation.BOTTOM) {
-            return DockLocation.TOP
-        }
-    }
-
-    toString() {
-        return "(DockLocation: name=" + this._name + ", orientation=" + this._orientation + ")";
+    else {
+        return CENTER;
     }
 }
 
+/** @hidden @internal */
+export const getDockRect = (location: DockLocationType, r: Rect): Rect => {
+    if (location === "top") {
+        return new Rect(r.x, r.y, r.width, r.height / 2);
+    }
+    else if (location === "bottom") {
+        return new Rect(r.x, r.getBottom() - r.height / 2, r.width, r.height / 2);
+    }
+    if (location === "left") {
+        return new Rect(r.x, r.y, r.width / 2, r.height);
+    }
+    else if (location === "right") {
+        return new Rect(r.getRight() - r.width / 2, r.y, r.width / 2, r.height);
+    }
+    else {
+        return r.clone();
+    }
+}
 
-export default DockLocation;
+/** @hidden @internal */
+export const split = (location: DockLocationType, rect: Rect, size: number) => {
+    if (location === "top") {
+        let r1 = new Rect(rect.x, rect.y, rect.width, size);
+        let r2 = new Rect(rect.x, rect.y + size, rect.width, rect.height - size);
+        return { start: r1, end: r2 };
+    }
+    else if (location === "left") {
+        let r1 = new Rect(rect.x, rect.y, size, rect.height);
+        let r2 = new Rect(rect.x + size, rect.y, rect.width - size, rect.height);
+        return { start: r1, end: r2 };
+    }
+    if (location === "right") {
+        let r1 = new Rect(rect.getRight() - size, rect.y, size, rect.height);
+        let r2 = new Rect(rect.x, rect.y, rect.width - size, rect.height);
+        return { start: r1, end: r2 };
+    }
+    else {//if (location === "bottom") {
+        let r1 = new Rect(rect.x, rect.getBottom() - size, rect.width, size);
+        let r2 = new Rect(rect.x, rect.y, rect.width, rect.height - size);
+        return { start: r1, end: r2 };
+    }
+}
 
+/** @hidden @internal */
+export const reflect = (location: DockLocationType): DockLocation => {
+    if (location === "top") {
+        return BOTTOM
+    }
+    else if (location === "left") {
+        return RIGHT
+    }
+    if (location === "right") {
+        return LEFT
+    }
+    else { //if (location === "bottom") {
+        return TOP
+    }
+}

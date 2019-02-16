@@ -1,7 +1,7 @@
 import Rect from "../Rect";
 import AttributeDefinitions from "../AttributeDefinitions";
 import Orientation from "../Orientation";
-import DockLocation from "../DockLocation";
+import * as DockLocation from "../DockLocation";
 import SplitterNode from "./SplitterNode";
 import Node from "./Node";
 import Model from "./Model";
@@ -280,26 +280,26 @@ class RowNode extends Node implements IDropTarget{
         if (this._model.isEnableEdgeDock() && this._parent === undefined) { // _root row
             if (x < this._rect.x + margin && (yy > h / 2 - half && yy < h / 2 + half)) {
                 let dockLocation = DockLocation.LEFT;
-                let outlineRect = dockLocation.getDockRect(this._rect);
+                let outlineRect = DockLocation.getDockRect(dockLocation.name, this._rect);
                 outlineRect.width = outlineRect.width / 2;
                 dropInfo = new DropInfo(this, outlineRect, dockLocation, -1, "flexlayout__outline_rect_edge");
             }
             else if (x > this._rect.getRight() - margin && (yy > h / 2 - half && yy < h / 2 + half)) {
                 let dockLocation = DockLocation.RIGHT;
-                let outlineRect = dockLocation.getDockRect(this._rect);
+                let outlineRect = DockLocation.getDockRect(dockLocation.name, this._rect);
                 outlineRect.width = outlineRect.width / 2;
                 outlineRect.x += outlineRect.width;
                 dropInfo = new DropInfo(this, outlineRect, dockLocation, -1, "flexlayout__outline_rect_edge");
             }
             else if (y < this._rect.y + margin && (xx > w / 2 - half && xx < w / 2 + half)) {
                 let dockLocation = DockLocation.TOP;
-                let outlineRect = dockLocation.getDockRect(this._rect);
+                let outlineRect = DockLocation.getDockRect(dockLocation.name, this._rect);
                 outlineRect.height = outlineRect.height / 2;
                 dropInfo = new DropInfo(this, outlineRect, dockLocation, -1, "flexlayout__outline_rect_edge");
             }
             else if (y > this._rect.getBottom() - margin && (xx > w / 2 - half && xx < w / 2 + half)) {
                 let dockLocation = DockLocation.BOTTOM;
-                let outlineRect = dockLocation.getDockRect(this._rect);
+                let outlineRect = DockLocation.getDockRect(dockLocation.name, this._rect);
                 outlineRect.height = outlineRect.height / 2;
                 outlineRect.y += outlineRect.height;
                 dropInfo = new DropInfo(this, outlineRect, dockLocation, -1, "flexlayout__outline_rect_edge");
@@ -316,7 +316,7 @@ class RowNode extends Node implements IDropTarget{
     }
 
     /** @hidden @internal */
-    drop(dragNode: (Node & IDraggable), location: DockLocation, index: number): void {
+    drop(dragNode: (Node & IDraggable), location: DockLocation.DockLocation, index: number): void {
         const dockLocation = location;
 
         let parent = dragNode.getParent();

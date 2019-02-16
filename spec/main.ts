@@ -1,7 +1,7 @@
 
 import Model from "../src/model/Model";
 import Actions from "../src/model/Actions";
-import DockLocation from "../src/DockLocation";
+import * as DockLocation from "../src/DockLocation";
 
 describe("Tree", function()
 {

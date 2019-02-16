@@ -1,9 +1,9 @@
 
 module.exports = {
-	mode:'development',
+	mode: 'development',
 	entry: {
-		demo: "./examples/demo/App.tsx",
-	    tests: "./spec/main.ts"
+		demo: "./examples/simple/main.tsx",
+		tests: "./spec/main.ts"
 	},
 
 	output: {
@@ -12,25 +12,26 @@ module.exports = {
 	},
 
 	resolve: {
-        // Add '.ts' and '.tsx' as resolvable extensions.
-        extensions: [".ts", ".tsx", ".js", ".json"]
-    },
+		// Add '.ts' and '.tsx' as resolvable extensions.
+		extensions: [".ts", ".tsx", ".js", ".json"]
+	},
 
-	watch:true,
+	watch: true,
 
 	devServer: {
-		contentBase: '.'
-	   },
+		port: 3000,
+		hot: true
+	},
 
 	devtool: 'source-map',
 
-    module: {
-        rules: [
-            // All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
-            { test: /\.tsx?$/, loader: "awesome-typescript-loader" },
+	module: {
+		rules: [
+			// All files with a '.ts' or '.tsx' extension will be handled by 'awesome-typescript-loader'.
+			{ test: /\.tsx?$/, loader: "awesome-typescript-loader" },
 
-            // All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
-            { enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
-        ]
-    }
+			// All output '.js' files will have any sourcemaps re-processed by 'source-map-loader'.
+			{ enforce: "pre", test: /\.js$/, loader: "source-map-loader" }
+		]
+	}
 };

@@ -1,4 +1,4 @@
-import {JSMap} from "../Types";
+import {Dictionary} from "../Types";
 import Node from "./Node";
 import RowNode from "./RowNode";
 import Action from "./Action";
@@ -7,7 +7,7 @@ import TabNode from "./TabNode";
 import TabSetNode from "./TabSetNode";
 import BorderSet from "./BorderSet";
 import BorderNode from "./BorderNode";
-import DockLocation from "../DockLocation";
+import * as DockLocation from "../DockLocation";
 import AttributeDefinitions from "../AttributeDefinitions";
 import Attribute from "../Attribute";
 import Orientation from "../Orientation";
@@ -24,9 +24,9 @@ class Model {
     private static _attributeDefinitions: AttributeDefinitions = Model._createAttributeDefinitions();
 
     /** @hidden @internal */
-    private _attributes: JSMap<any>;
+    private _attributes: Dictionary<any>;
     /** @hidden @internal */
-    private _idMap: JSMap<Node>;
+    private _idMap: Dictionary<Node>;
     /** @hidden @internal */
     private _nextId: number;
     /** @hidden @internal */
@@ -245,7 +245,9 @@ class Model {
             case Actions.UPDATE_NODE_ATTRIBUTES:
                 {
                     let node = this._idMap[action.data["node"]];
-                    node._updateAttrs(action.data["json"]);
+                    if (node !== undefined) {
+                        node._updateAttrs(action.data["json"]);
+                    }
                     break;
                 }
         }

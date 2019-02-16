@@ -5,38 +5,43 @@ import Actions from "../model/Actions";
 import TabNode from "../model/TabNode";
 import Layout from "./Layout";
 
-/** @hidden @internal */
 export interface IBorderButtonProps {
     layout: Layout,
     node: TabNode,
     selected: boolean,
-    border:string
+    border: string
 }
 
-/** @hidden @internal */
 export class BorderButton extends React.Component<IBorderButtonProps, any> {
     selfRef?: HTMLDivElement;
     contentsRef?: HTMLDivElement;
 
-    constructor(props:IBorderButtonProps) {
+    constructor(props: IBorderButtonProps) {
         super(props);
     }
 
-    onMouseDown(event:Event) {
-        this.props.layout.dragStart(event, "Move: " + this.props.node.getName(), this.props.node, this.props.node.isEnableDrag(), this.onClick.bind(this), (event: Event) => undefined);
+    onMouseDown(event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) {
+        this.props.layout.dragStart(
+            event,
+            "Move: " + this.props.node.getName(),
+            this.props.node,
+            this.props.node.isEnableDrag(),
+            this.onClick.bind(this),
+            () => undefined
+        );
     }
 
-    onClick(event:React.MouseEvent<HTMLDivElement>) {
+    onClick() {
         const node = this.props.node;
         this.props.layout.doAction(Actions.selectTab(node.getId()));
     }
 
-    onClose(event:React.MouseEvent<HTMLDivElement>) {
+    onClose() {
         const node = this.props.node;
         this.props.layout.doAction(Actions.deleteTab(node.getId()));
     }
 
-    onCloseMouseDown(event:React.MouseEvent<HTMLDivElement>) {
+    onCloseMouseDown(event: React.SyntheticEvent<HTMLDivElement>) {
         event.stopPropagation();
     }
 
@@ -58,7 +63,7 @@ export class BorderButton extends React.Component<IBorderButtonProps, any> {
     render() {
         let cm = this.props.layout.getClassName;
         let classNames = cm("flexlayout__border_button") + " " +
-                        cm("flexlayout__border_button_" + this.props.border);
+            cm("flexlayout__border_button_" + this.props.border);
         const node = this.props.node;
 
         if (this.props.selected) {
@@ -75,30 +80,28 @@ export class BorderButton extends React.Component<IBorderButtonProps, any> {
         let leadingContent = undefined;
 
         if (node.getIcon() !== undefined) {
-            leadingContent = <img src={node.getIcon()}/>;
+            leadingContent = <img src={node.getIcon()} />;
         }
 
-        const content = <div ref={ref => this.contentsRef = (ref===null)?undefined:ref} className={cm("flexlayout__border_button_content")}>{node.getName()}</div>;
+        const content = <div ref={ref => this.contentsRef = (ref === null) ? undefined : ref} className={cm("flexlayout__border_button_content")}>{node.getName()}</div>;
 
         let closeButton = undefined;
         if (this.props.node.isEnableClose()) {
             closeButton = <div className={cm("flexlayout__border_button_trailing")}
-                               onMouseDown={this.onCloseMouseDown.bind(this)}
-                               onClick={this.onClose.bind(this)}
-                               onTouchStart={this.onCloseMouseDown.bind(this)}
-                />;
+                onMouseDown={this.onCloseMouseDown.bind(this)}
+                onClick={this.onClose.bind(this)}
+                onTouchStart={this.onCloseMouseDown.bind(this)}
+            />;
         }
 
-        return <div ref={ref => this.selfRef = (ref===null)?undefined:ref}
-                    style={{}}
-                    className={classNames}
-                    onMouseDown={this.onMouseDown.bind(this)}
-                    onTouchStart={this.onMouseDown.bind(this)}>
+        return <div ref={ref => this.selfRef = (ref === null) ? undefined : ref}
+            style={{}}
+            className={classNames}
+            onMouseDown={this.onMouseDown.bind(this)}
+            onTouchStart={this.onMouseDown.bind(this)}>
             {leadingContent}
             {content}
             {closeButton}
         </div>;
     }
 }
-
-// export default BorderButton;

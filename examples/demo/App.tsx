@@ -78,17 +78,17 @@ class App extends React.Component<any, { layoutFile: string | null, model: FlexL
         alert("Error loading json config file: " + this.loadingLayoutName + "\n" + reason);
     }
 
-    onAddClick(event:Event) {
-        if (this.state.model!.getMaximizedTabset() == null) {
-            (this.refs.layout as FlexLayout.Layout).addTabWithDragAndDropIndirect("Add grid<br>(Drag to location)", {
-                component: "grid",
-                name: "a new grid"
-            }, this.onAdded.bind(this));
-            this.setState({ adding: true });
-        }
+    onAddClick(_event: React.MouseEvent<HTMLButtonElement>) {
+        // if (this.state.model!.getMaximizedTabset() == null) {
+        //     (this.refs.layout as FlexLayout.Layout).addTabWithDragAndDropIndirect("Add grid<br>(Drag to location)", {
+        //         component: "grid",
+        //         name: "a new grid"
+        //     }, this.onAdded.bind(this));
+        //     this.setState({ adding: true });
+        // }
     }
 
-    onShowLayoutClick(event:Event) {
+    onShowLayoutClick(_event: React.MouseEvent<HTMLButtonElement>) {
         console.log(JSON.stringify(this.state.model!.toJson(), null, "\t"));
     }
 
@@ -96,7 +96,7 @@ class App extends React.Component<any, { layoutFile: string | null, model: FlexL
         this.setState({ adding: false });
     }
 
-    onTableClick(node:Node, event:Event) {
+    onTableClick(node: Node, _event: Event) {
         console.log("tab: \n" + node._toAttributeString());
         console.log("tabset: \n" + node.getParent()!._toAttributeString());
     }
@@ -139,12 +139,12 @@ class App extends React.Component<any, { layoutFile: string | null, model: FlexL
         return null;
     }
 
-    onSelectLayout(event:React.FormEvent) {
+    onSelectLayout(event: React.FormEvent) {
         var target = event.target as HTMLSelectElement;
         this.loadLayout(target.value);
     }
 
-    onReloadFromFile(event:Event) {
+    onReloadFromFile(_event: React.MouseEvent<HTMLButtonElement>) {
         this.loadLayout(this.state.layoutFile!, true);
     }
 

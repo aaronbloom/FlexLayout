@@ -1,10 +1,10 @@
-import { JSMap } from "../Types";
+import { Dictionary } from "../Types";
 
 class Action {
     type: string;
-    data: JSMap<any>;
+    data: Dictionary<any>;
 
-    constructor(type: string, data:JSMap<any>) {
+    constructor(type: string, data:Dictionary<any>) {
         this.type = type;
         this.data = data;
     }

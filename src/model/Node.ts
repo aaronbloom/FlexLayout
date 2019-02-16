@@ -2,9 +2,9 @@ import Rect from "../Rect";
 import Model from "./Model";
 import AttributeDefinitions from "../AttributeDefinitions";
 import Orientation from "../Orientation";
-import DockLocation from "../DockLocation";
+import * as DockLocation from "../DockLocation";
 import DropInfo from "../DropInfo";
-import { JSMap } from "../Types";
+import { Dictionary } from "../Types";
 import IDraggable from "./IDraggable";
 
 abstract class Node {
@@ -12,7 +12,7 @@ abstract class Node {
     /** @hidden @internal */
     protected _model: Model;
     /** @hidden @internal */
-    protected _attributes: JSMap<any>;
+    protected _attributes: Dictionary<any>;
     /** @hidden @internal */
     protected _parent?: Node;
     /** @hidden @internal */
@@ -24,7 +24,7 @@ abstract class Node {
     /** @hidden @internal */
     protected _visible: boolean;
     /** @hidden @internal */
-    protected _listeners: JSMap<(params: any) => void>;
+    protected _listeners: Dictionary<(params: any) => void>;
     /** @hidden @internal */
     protected _dirty: boolean = false;
     /** @hidden @internal */
@@ -121,8 +121,9 @@ abstract class Node {
     /** @hidden @internal */
     _fireEvent(event: string, params: any) {
         //console.log(this._type, " fireEvent " + event + " " + JSON.stringify(params));
-        if (this._listeners[event] !== undefined) {
-            this._listeners[event](params);
+        const listener = this._listeners[event];
+        if (listener !== undefined) {
+            listener(params);
         }
     }
 
@@ -275,7 +276,7 @@ abstract class Node {
     }
 
     /** @hidden @internal */
-    _styleWithPosition(style?: JSMap<any>) {
+    _styleWithPosition(style?: Dictionary<any>) {
         if (style == undefined) {
             style = {};
         }

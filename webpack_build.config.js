@@ -2,7 +2,8 @@ module.exports = {
 	entry: {
 		flexlayout: "./src/index.ts"
 	},
-
+	mode: 'development',
+	devtool: 'source-map',
 	output: {
 		path: __dirname,
 		library: "FlexLayout",

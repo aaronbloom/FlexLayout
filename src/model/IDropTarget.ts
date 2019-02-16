@@ -1,7 +1,7 @@
 import Node from "./Node";
 import IDraggable from "./IDraggable";
 import DropInfo from "../DropInfo";
-import DockLocation from "../DockLocation";
+import { DockLocation } from "../DockLocation";
 
 export default interface IDropTarget {
 /** @hidden @internal */

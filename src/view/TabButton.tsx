@@ -28,16 +28,16 @@ export class TabButton extends React.Component<ITabButtonProps, any> {
         this.onEndEdit = this.onEndEdit.bind(this);
     }
 
-    onMouseDown(event: Event) {
+    onMouseDown(event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) {
         this.props.layout.dragStart(event, "Move: " + this.props.node.getName(), this.props.node, this.props.node.isEnableDrag(), this.onClick.bind(this), this.onDoubleClick.bind(this));
     }
 
-    onClick(event: Event) {
+    onClick() {
         const node = this.props.node;
         this.props.layout.doAction(Actions.selectTab(node.getId()));
     }
 
-    onDoubleClick(event: Event) {
+    onDoubleClick() {
         if (this.props.node.isEnableRename()) {
             this.setState({ editing: true });
             document.body.addEventListener("mousedown", this.onEndEdit);
@@ -65,7 +65,7 @@ export class TabButton extends React.Component<ITabButtonProps, any> {
         this.props.layout.doAction(Actions.deleteTab(node.getId()));
     }
 
-    onCloseMouseDown(event: React.MouseEvent<HTMLDivElement>) {
+    onCloseMouseDown(event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) {
         event.stopPropagation();
     }
 
@@ -89,7 +89,7 @@ export class TabButton extends React.Component<ITabButtonProps, any> {
     }
 
 
-    onTextBoxMouseDown(event: React.MouseEvent<HTMLInputElement>) {
+    onTextBoxMouseDown(event: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLDivElement>) {
         //console.log("onTextBoxMouseDown");
         event.stopPropagation();
     }

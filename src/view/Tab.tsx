@@ -3,7 +3,7 @@ import TabSetNode from "../model/TabSetNode";
 import TabNode from "../model/TabNode";
 import Actions from "../model/Actions";
 import Layout from "./Layout";
-import { JSMap } from "../Types";
+import { Dictionary } from "../Types";
 
 /** @hidden @internal */
 export interface ITabProps {
@@ -37,7 +37,7 @@ export class Tab extends React.Component<ITabProps, any> {
         }
     }
 
-    onMouseDown(event:React.MouseEvent<HTMLDivElement>) {
+    onMouseDown(event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) {
         const parent = this.props.node.getParent() as TabSetNode;
         if (parent.getType() === TabSetNode.TYPE) {
             if (!parent.isActive()) {
@@ -51,7 +51,7 @@ export class Tab extends React.Component<ITabProps, any> {
 
         const node = this.props.node;
         const parentNode = node.getParent() as TabSetNode;
-        const style:JSMap<any> = node._styleWithPosition({
+        const style:Dictionary<any> = node._styleWithPosition({
             display: this.props.selected ? "block" : "none"
         });
 

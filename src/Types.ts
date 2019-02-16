@@ -5,4 +5,4 @@
  * example: var a = {name1:12, name2:343} would be defined as a JSMap&lt;number&gt;
  * 
  */
-export type JSMap<T> = { [key: string]: T; }
+export type Dictionary<T> = Record<string, T | undefined>

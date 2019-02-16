@@ -1,5 +1,5 @@
 import Orientation from "./Orientation";
-import { JSMap } from "./Types";
+import { Dictionary } from "./Types";
 
 class Rect {
 
@@ -47,7 +47,7 @@ class Rect {
         this.styleWithPosition(element.style);
     }
 
-    styleWithPosition(style: JSMap<any>) {
+    styleWithPosition(style: Dictionary<any>) {
         style.left = this.x + "px";
         style.top = this.y + "px";
         style.width = Math.max(0, this.width) + "px"; // need Math.max to prevent -ve, cause error in IE

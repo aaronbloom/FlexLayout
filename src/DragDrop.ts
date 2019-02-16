@@ -4,13 +4,13 @@ class DragDrop {
     static instance = new DragDrop();
 
     /** @hidden @internal */
-    private _fDblClick: ((event: Event) => void) | undefined;
+    private _fDblClick: ((event: React.SyntheticEvent<HTMLElement> | Event) => void) | undefined;
     /** @hidden @internal */
-    private _fClick: ((event: Event) => void) | undefined;
+    private _fClick: ((event: React.SyntheticEvent<HTMLElement> | Event) => void) | undefined;
     /** @hidden @internal */
-    private _fDragEnd: ((event: Event) => void) | undefined;
+    private _fDragEnd: ((event: React.SyntheticEvent<HTMLElement> | Event) => void) | undefined;
     /** @hidden @internal */
-    private _fDragMove: ((event: Event) => void) | undefined;
+    private _fDragMove: ((event: React.SyntheticEvent<HTMLElement> | Event) => void) | undefined;
     /** @hidden @internal */
     private _fDragStart: ((pos: { clientX: number, clientY: number }) => boolean) | undefined;
     /** @hidden @internal */
@@ -55,7 +55,7 @@ class DragDrop {
     }
 
     // if you add the glass pane then you should remove it
-    addGlass(fCancel: (() => void) | undefined) {
+    addGlass(fCancel: ((wasDragging: boolean) => void) | undefined) {
         if (!this._glassShowing) {
             const glassRect = new Rect(0, 0, document.documentElement.clientWidth, document.documentElement.clientHeight);
             glassRect.positionElement(this._glass);
@@ -100,36 +100,36 @@ class DragDrop {
     }
 
     /** @hidden @internal */
-    private _getLocationEventEnd(event: any) {
+    private _getLocationEventEnd(event: React.SyntheticEvent<HTMLElement> | React.TouchEvent<HTMLElement> | Event) {
         let posEvent: any = event;
-        if (event.changedTouches) {
+        if ('changedTouches' in event) {
             posEvent = event.changedTouches[0]
         }
         return posEvent;
     }
 
     /** @hidden @internal */
-    private _stopPropagation(event: Event) {
+    private _stopPropagation(event: React.SyntheticEvent<HTMLElement> | Event) {
         if (event.stopPropagation) {
             event.stopPropagation();
         }
     }
 
     /** @hidden @internal */
-    private _preventDefault(event: Event) {
+    private _preventDefault(event: React.SyntheticEvent<HTMLElement> | Event) {
         if (event.preventDefault) {
             event.preventDefault();
         }
         return event;
     }
 
-    startDrag(event: Event | undefined,
+    startDrag(event: React.SyntheticEvent<HTMLElement> | undefined,
         fDragStart: ((pos: { clientX: number, clientY: number }) => boolean) | undefined,
-        fDragMove: ((event: Event) => void) | undefined,
-        fDragEnd: ((event: Event) => void) | undefined,
-        fDragCancel?: (() => void) | undefined,
-        fClick?: ((event: Event) => void) | undefined,
-        fDblClick?: ((event: Event) => void) | undefined) {
+        fDragMove: ((event: React.SyntheticEvent<HTMLElement>| Event) => void) | undefined,
+        fDragEnd: ((event: React.SyntheticEvent<HTMLElement> | Event) => void) | undefined,
+        fDragCancel?: ((wasDragging: boolean) => void) | undefined,
+        fClick?: ((event: React.SyntheticEvent<HTMLElement> |   Event) => void) | undefined,
+        fDblClick?: ((event: React.SyntheticEvent<HTMLElement> |    Event) => void) | undefined) {
 
         const posEvent = this._getLocationEvent(event);
         this.addGlass(fDragCancel);
@@ -164,7 +164,7 @@ class DragDrop {
     }
 
     /** @hidden @internal */
-    private _onMouseMove(event: Event) {
+    private _onMouseMove(event: React.SyntheticEvent<HTMLElement> | Event) {
         const posEvent = this._getLocationEvent(event);
         this._stopPropagation(event);
         this._preventDefault(event);
@@ -186,7 +186,7 @@ class DragDrop {
     }
 
     /** @hidden @internal */
-    private _onMouseUp(event: Event) {
+    private _onMouseUp(event: React.SyntheticEvent<HTMLElement> | Event) {
         const posEvent = this._getLocationEventEnd(event);
 
         this._stopPropagation(event);

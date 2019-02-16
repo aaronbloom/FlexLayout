@@ -15,7 +15,7 @@ export interface ITabSetProps {
 /** @hidden @internal */
 export class TabSet extends React.Component<ITabSetProps, any> {
     headerRef?: HTMLDivElement;
-    overflowbuttonRef: any;
+    overflowbuttonRef?: Element;
     toolbarRef?: HTMLDivElement;
 
     recalcVisibleTabs: boolean;
@@ -201,7 +201,7 @@ export class TabSet extends React.Component<ITabSetProps, any> {
         </div>;
     }
 
-    onOverflowClick(hiddenTabs: Array<{ name: string, node: TabNode, index: number }>, event: React.MouseEvent<HTMLDivElement>) {
+    onOverflowClick(hiddenTabs: Array<{ name: string, node: TabNode, index: number }>) {
         //console.log("hidden tabs: " + hiddenTabs);
         const element = this.overflowbuttonRef as Element;
         PopupMenu.show(element, hiddenTabs, this.onOverflowItemSelect.bind(this), this.props.layout.getClassName);
@@ -211,7 +211,7 @@ export class TabSet extends React.Component<ITabSetProps, any> {
         this.props.layout.doAction(Actions.selectTab(item.node.getId()));
     }
 
-    onMouseDown(event: Event) {
+    onMouseDown(event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) {
         let name = this.props.node.getName();
         if (name === undefined) {
             name = "";
@@ -220,10 +220,10 @@ export class TabSet extends React.Component<ITabSetProps, any> {
             name = ": " + name;
         }
         this.props.layout.doAction(Actions.setActiveTabset(this.props.node.getId()));
-        this.props.layout.dragStart(event, "Move tabset" + name, this.props.node, this.props.node.isEnableDrag(), (event: Event) => undefined, this.onDoubleClick.bind(this));
+        this.props.layout.dragStart(event, "Move tabset" + name, this.props.node, this.props.node.isEnableDrag(), () => undefined, this.onDoubleClick.bind(this));
     }
 
-    onInterceptMouseDown(event: React.MouseEvent<HTMLDivElement>) {
+    onInterceptMouseDown(event: React.SyntheticEvent<HTMLElement>) {
         event.stopPropagation();
     }
 
@@ -233,7 +233,7 @@ export class TabSet extends React.Component<ITabSetProps, any> {
         }
     }
 
-    onDoubleClick(event: Event) {
+    onDoubleClick() {
         if (this.props.node.isEnableMaximize()) {
             this.props.layout.maximize(this.props.node);
         }

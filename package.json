@@ -5,6 +5,7 @@
   "main": "lib/index.js",
   "types": "./declarations/index.d.ts",
   "scripts": {
+    "demo": "webpack --config webpack.config.js",
     "test": "jasmine",
     "build": "npm run build:commonjs && npm run build:umd && npm run build:umd:min",
     "build:commonjs": "tsc -p tsconfig2.json",

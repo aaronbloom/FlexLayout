@@ -38,7 +38,7 @@ class BorderSet {
     }
 
     /** @hidden @internal */
-    static _fromJson(json: any, model: Model) {
+    static _fromJson(json: any, model: Model): BorderSet {
         const borderSet = new BorderSet(model);
         borderSet._borders = json.map((borderJson: any) => BorderNode._fromJson(borderJson, model));
         return borderSet;
@@ -63,7 +63,7 @@ class BorderSet {
             if (border.isShowing()) {
                 border._setAdjustedSize(border.getSize());
                 const visible = border.getSelected() !== -1;
-                if (border.getLocation().getOrientation() === Orientation.HORZ) {
+                if (border.getLocation().orientation === Orientation.HORZ) {
                     sumWidth += border.getBorderBarSize() + this._model.getSplitterSize();
                     if (visible) {
                         sumWidth += border.getSize();
@@ -88,14 +88,14 @@ class BorderSet {
             if (border.getSelected() !== -1) { //visible
                 const size = border._getAdjustedSize();
                 if (sumWidth > width && adjustableWidth > 0
-                    && border.getLocation().getOrientation() === Orientation.HORZ
+                    && border.getLocation().orientation === Orientation.HORZ
                     && size > 0) {
                     border._setAdjustedSize(size - 1);
                     sumWidth--;
                     adjustableWidth--;
                 }
                 else if (sumHeight > height && adjustableHeight > 0
-                    && border.getLocation().getOrientation() === Orientation.VERT
+                    && border.getLocation().orientation === Orientation.VERT
                     && size > 0) {
                     border._setAdjustedSize(size - 1);
                     sumHeight--;

@@ -1,7 +1,7 @@
 import Rect from "../Rect";
 import AttributeDefinitions from "../AttributeDefinitions";
 import Attribute from "../Attribute";
-import DockLocation from "../DockLocation";
+import * as DockLocation from "../DockLocation";
 import DropInfo from "./../DropInfo";
 import Node from "./Node";
 import Model from "./Model";
@@ -131,7 +131,7 @@ class TabSetNode extends Node implements IDraggable, IDropTarget{
         }
         else if (this._contentRect!.contains(x, y)) {
             let dockLocation = DockLocation.getLocation(this._contentRect!, x, y);
-            let outlineRect = dockLocation.getDockRect(this._rect);
+            let outlineRect = DockLocation.getDockRect(dockLocation.name, this._rect);
             dropInfo = new DropInfo(this, outlineRect, dockLocation, -1, "flexlayout__outline_rect");
         }
         else if (this._children.length > 0 && this._tabHeaderRect != undefined && this._tabHeaderRect.contains(x, y)) {
@@ -203,7 +203,7 @@ class TabSetNode extends Node implements IDraggable, IDropTarget{
     }
 
     /** @hidden @internal */
-    drop(dragNode: (Node & IDraggable), location: DockLocation, index: number) {
+    drop(dragNode: (Node & IDraggable), location: DockLocation.DockLocation, index: number) {
         const dockLocation = location;
 
         if (this === dragNode) { // tabset drop into itself
@@ -284,11 +284,11 @@ class TabSetNode extends Node implements IDraggable, IDropTarget{
             const parentRow = this._parent as Node;
             const pos = parentRow.getChildren().indexOf(this);
 
-            if (parentRow.getOrientation() === dockLocation._orientation) {
+            if (parentRow.getOrientation() === dockLocation.orientation) {
                 tabSet._setWeight(this.getWeight() / 2);
                 this._setWeight(this.getWeight() / 2);
                 //console.log("added child 50% size at: " +  pos + dockLocation.indexPlus);
-                parentRow._addChild(tabSet, pos + dockLocation._indexPlus);
+                parentRow._addChild(tabSet, pos + dockLocation.indexPlus);
             }
             else {
                 // create a new row to host the new tabset (it will go in the opposite direction)
@@ -299,7 +299,7 @@ class TabSetNode extends Node implements IDraggable, IDropTarget{
                 this._setWeight(50);
                 tabSet._setWeight(50);
                 //console.log("added child 50% size at: " +  dockLocation.indexPlus);
-                newRow._addChild(tabSet, dockLocation._indexPlus);
+                newRow._addChild(tabSet, dockLocation.indexPlus);
 
                 parentRow._removeChild(this);
                 parentRow._addChild(newRow, pos);

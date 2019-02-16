@@ -1,32 +1,33 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import { TabNode } from ".";
 
 /** @hidden @internal */
 export interface IPopupMenuProps {
     element: Element,
-    items:Array<{index:number, name:string}>,
-    onHide: ()=>void,
-    onSelect: (item:{index:number, name:string})=>void,
+    items: Array<{ index: number, node: TabNode, name: string }>,
+    onHide: () => void,
+    onSelect: (item: { index: number, node: TabNode, name: string }) => void,
     classNameMapper: (defaultClassName: string) => string
 }
 
 /** @hidden @internal */
 class PopupMenu extends React.Component<IPopupMenuProps, any> {
 
-    items:Array<{index:number, name:string}> = [];
+    items: Array<{ index: number, name: string }> = [];
     hidden: boolean = true;
-    elm? : Element;
+    elm?: Element;
 
 
-    constructor(props:IPopupMenuProps) {
+    constructor(props: IPopupMenuProps) {
         super(props);
         this.onDocMouseUp = this.onDocMouseUp.bind(this);
         this.hidden = false;
     }
 
     static show(triggerElement: Element,
-        items: Array<{index:number, name:string}>,
-        onSelect: (item:{index:number, name:string})=>void,
+        items: Array<{ index: number, node: TabNode, name: string }>,
+        onSelect: (item: { index: number, node: TabNode, name: string }) => void,
         classNameMapper: (defaultClassName: string) => string) {
 
         const triggerRect = triggerElement.getBoundingClientRect();
@@ -43,7 +44,7 @@ class PopupMenu extends React.Component<IPopupMenuProps, any> {
             document.body.removeChild(elm);
         };
 
-        ReactDOM.render(<PopupMenu element={elm} onSelect={onSelect} onHide={onHide} items={items} classNameMapper={classNameMapper}/>, elm);
+        ReactDOM.render(<PopupMenu element={elm} onSelect={onSelect} onHide={onHide} items={items} classNameMapper={classNameMapper} />, elm);
     }
 
     componentDidMount() {
@@ -54,8 +55,8 @@ class PopupMenu extends React.Component<IPopupMenuProps, any> {
         document.removeEventListener("mouseup", this.onDocMouseUp);
     }
 
-    onDocMouseUp(event:Event) {
-        setTimeout(() =>{
+    onDocMouseUp(event: Event) {
+        setTimeout(() => {
             this.hide();
         }, 0);
     }
@@ -67,7 +68,7 @@ class PopupMenu extends React.Component<IPopupMenuProps, any> {
         }
     }
 
-    onItemClick(item:{index:number, name:string}, event:Event) {
+    onItemClick(item: { index: number, node: TabNode, name: string }, event: React.MouseEvent<HTMLDivElement>) {
         this.props.onSelect(item);
         this.hide();
         event.stopPropagation();
@@ -75,7 +76,7 @@ class PopupMenu extends React.Component<IPopupMenuProps, any> {
 
     render() {
         const items = this.props.items.map(item => <div key={item.index} className={this.props.classNameMapper("flexlayout__popup_menu_item")}
-                                                        onClick={this.onItemClick.bind(this, item)}>{item.name}</div>);
+            onClick={this.onItemClick.bind(this, item)}>{item.name}</div>);
 
         return <div className={this.props.classNameMapper("flexlayout__popup_menu")}>
             {items}

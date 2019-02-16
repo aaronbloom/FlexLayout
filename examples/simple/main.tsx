@@ -1,3 +1,7 @@
+import * as React from "react";
+import * as ReactDOM from "react-dom";
+import * as FlexLayout from "../../src/index";
+
 var json = {
     global: {},
     layout: {
@@ -32,27 +36,35 @@ var json = {
     }
 };
 
-class Main extends React.Component {
+interface MainProps { }
 
-    constructor(props) {
+interface MainState {
+    model: FlexLayout.Model;
+}
+
+class Main extends React.Component<MainProps, MainState> {
+
+    constructor(props: MainProps) {
         super(props);
-        this.state = {model: FlexLayout.Model.fromJson(json)};
+        this.state = { model: FlexLayout.Model.fromJson(json) };
     }
 
-    factory(node) {
+    private factory(node: FlexLayout.TabNode) {
         var component = node.getComponent();
         if (component === "button") {
             return <button>{node.getName()}</button>;
         }
+        return null;
     }
 
-    render() {
+    public render() {
         return (
             <FlexLayout.Layout
                 model={this.state.model}
-                factory={this.factory.bind(this)}/>
+                factory={this.factory.bind(this)}
+            />
         );
     }
 }
 
-ReactDOM.render(<Main/>, document.getElementById("container"));
+ReactDOM.render(<Main />, document.getElementById("container"));

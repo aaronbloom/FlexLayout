@@ -6,7 +6,7 @@ import Attribute from "../Attribute";
 import Rect from "../Rect";
 import Model from "./Model";
 import IDraggable from "./IDraggable";
-import { JSMap } from "../Types";
+import { Dictionary } from "../Types";
 
 class TabNode extends Node implements IDraggable{
 
@@ -17,7 +17,7 @@ class TabNode extends Node implements IDraggable{
     /** @hidden @internal */
     private _tabRect?: Rect;
     /** @hidden @internal */
-    private _extra: JSMap<any>;
+    private _extra: Dictionary<any>;
 
     /** @hidden @internal */
     constructor(model: Model, json: any) {

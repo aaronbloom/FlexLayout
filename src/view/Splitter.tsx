@@ -18,10 +18,10 @@ export interface ISplitterProps {
 /** @hidden @internal */
 export class Splitter extends React.Component<ISplitterProps, any> {
 
-    pBounds?: Array<number>;
-    outlineDiv?: HTMLDivElement;
+    private pBounds?: Array<number>;
+    private outlineDiv?: HTMLDivElement;
 
-    onMouseDown(event: Event) {
+    onMouseDown(event: React.SyntheticEvent<HTMLElement>) {
         DragDrop.instance.startDrag(event, this.onDragStart.bind(this), this.onDragMove.bind(this), this.onDragEnd.bind(this), this.onDragCancel.bind(this));
         const parentNode = this.props.node.getParent() as RowNode;
         this.pBounds = parentNode._getSplitterBounds(this.props.node);
@@ -34,34 +34,35 @@ export class Splitter extends React.Component<ISplitterProps, any> {
         rootdiv.appendChild(this.outlineDiv);
     }
 
-    onDragCancel(wasDragging: boolean) {
+    onDragCancel() {
         const rootdiv = ReactDOM.findDOMNode(this.props.layout) as Element;
         rootdiv.removeChild(this.outlineDiv as Element);
     }
 
-    onDragStart(event: React.MouseEvent<HTMLDivElement>) {
-
+    onDragStart() {
         return true;
     }
 
-    onDragMove(event: React.MouseEvent<HTMLDivElement>) {
+    onDragMove(event: any) {
         const clientRect = (ReactDOM.findDOMNode(this.props.layout) as Element).getBoundingClientRect();
-        const pos = {
-            x: event.clientX - clientRect.left,
-            y: event.clientY - clientRect.top
-        };
+        if ('clientX' in event && 'clientY' in event) {
+            const pos = {
+                x: event.clientX - clientRect.left,
+                y: event.clientY - clientRect.top
+            };
 
-        let outlineDiv = this.outlineDiv as HTMLDivElement;
+            let outlineDiv = this.outlineDiv as HTMLDivElement;
 
-        if (this.props.node.getOrientation() === Orientation.HORZ) {
-            outlineDiv.style.top = this.getBoundPosition(pos.y - 4) + "px";
-        }
-        else {
-            outlineDiv.style.left = this.getBoundPosition(pos.x - 4) + "px";
+            if (this.props.node.getOrientation() === Orientation.HORZ) {
+                outlineDiv.style.top = this.getBoundPosition(pos.y - 4) + "px";
+            }
+            else {
+                outlineDiv.style.left = this.getBoundPosition(pos.x - 4) + "px";
+            }
         }
     }
 
-    onDragEnd(event: React.MouseEvent<HTMLDivElement>, didDrag: boolean) {
+    onDragEnd() {
         const node = this.props.node;
         const parentNode = node.getParent() as RowNode;
         let value = 0;
@@ -119,5 +120,3 @@ export class Splitter extends React.Component<ISplitterProps, any> {
         </div>;
     }
 }
-
-// export default Splitter;

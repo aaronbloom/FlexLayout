@@ -1,7 +1,7 @@
 import Node from "./Node";
 import Model from "./Model";
 import Rect from "../Rect";
-import DockLocation from "../DockLocation";
+import * as DockLocation from "../DockLocation";
 import Orientation from "../Orientation";
 import DropInfo from "../DropInfo";
 import TabNode from "./TabNode";
@@ -22,19 +22,19 @@ class BorderNode extends Node implements IDropTarget{
     /** @hidden @internal */
 	private _tabHeaderRect?: Rect;
     /** @hidden @internal */
-	private _location: DockLocation;
+	private _location: DockLocation.DockLocation;
     /** @hidden @internal */
 	private _drawChildren: Array<Node>;
     /** @hidden @internal */
 	private _adjustedSize: number = 0;
 
 	/** @hidden @internal */
-	constructor(location: DockLocation, json: any, model: Model) {
+	constructor(location: DockLocation.DockLocation, json: any, model: Model) {
 		super(model);
 
 		this._location = location;
 		this._drawChildren = [];
-		this._attributes["id"] = `border_${location.getName()}`;
+		this._attributes["id"] = `border_${location.name}`;
 		BorderNode._attributeDefinitions.fromJson(json, this._attributes);
 		model._addNode(this);
 	}
@@ -79,7 +79,7 @@ class BorderNode extends Node implements IDropTarget{
 	}
 
 	getOrientation() {
-		return this._location.getOrientation();
+		return this._location.orientation;
 	}
 
 	isMaximized() {
@@ -122,7 +122,7 @@ class BorderNode extends Node implements IDropTarget{
 
 	/** @hidden @internal */
 	_layoutBorderOuter(outer :Rect) {
-		const split1 = this._location.split(outer, this.getBorderBarSize()); // split border outer
+		const split1 = DockLocation.split(this._location.name, outer, this.getBorderBarSize()); // split border outer
 		this._tabHeaderRect = split1.start;
 		return split1.end;
 	}
@@ -133,9 +133,9 @@ class BorderNode extends Node implements IDropTarget{
 		const location = this._location;
 
 		const split1 =
-			location.split(inner, this._adjustedSize + this._model.getSplitterSize()); // split off tab contents
+			DockLocation.split(location.name, inner, this._adjustedSize + this._model.getSplitterSize()); // split off tab contents
 		const split2 =
-			location.reflect().split(split1.start, this._model.getSplitterSize()); // split contents into content and splitter
+			DockLocation.split(DockLocation.reflect(location.name).name, split1.start, this._model.getSplitterSize()); // split contents into content and splitter
 
 		this._contentRect = split2.end;
 
@@ -188,7 +188,7 @@ class BorderNode extends Node implements IDropTarget{
 		const dockLocation = DockLocation.CENTER;
 
 		if (this._tabHeaderRect!.contains(x, y)) {
-			if (this._location._orientation === Orientation.VERT) {
+			if (this._location.orientation === Orientation.VERT) {
 				if (this._children.length > 0) {
 					let child = this._children[0];
 					let childRect = (child as TabNode).getTabRect()!;
@@ -263,7 +263,7 @@ class BorderNode extends Node implements IDropTarget{
 	}
 
 	/** @hidden @internal */
-	drop(dragNode: (Node & IDraggable), location: DockLocation, index: number): void {
+	drop(dragNode: (Node & IDraggable), _location: DockLocation.DockLocation, index: number): void {
 		let fromIndex = 0;
 		let parent: Node | undefined = dragNode.getParent();
 		if (parent !== undefined) {
@@ -315,13 +315,13 @@ class BorderNode extends Node implements IDropTarget{
 	_toJson() {
 		const json: any = {};
 		BorderNode._attributeDefinitions.toJson(json, this._attributes);
-		json.location = this._location.getName();
+		json.location = this._location.name;
 		json.children = this._children.map((child) => (child as TabNode)._toJson());
 		return json;
 	}
 
 	/** @hidden @internal */
-	static _fromJson(json: any, model: Model) {
+	static _fromJson(json: any, model: Model): BorderNode {
 
 		const location = DockLocation.getByName(json.location);
 		const border = new BorderNode(location, json, model);

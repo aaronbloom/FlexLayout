@@ -1,6 +1,6 @@
 import Rect from "./Rect";
 import Node from "./model/Node";
-import DockLocation from "./DockLocation";
+import { DockLocation } from "./DockLocation";
 import IDropTarget from "./model/IDropTarget";
 
 class DropInfo {
