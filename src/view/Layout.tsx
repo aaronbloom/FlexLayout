@@ -110,14 +110,17 @@ export class Layout extends React.Component<ILayoutProps, any> {
     }
 
     public render() {
-        const borderComponents: React.ReactNode[] = [];
         const tabSetComponents: React.ReactNode[] = [];
         const tabComponents: Dictionary<React.ReactNode> = {};
         const splitterComponents: React.ReactNode[] = [];
 
         this.centerRect = this.model._layout(this.rect);
 
-        this.renderBorder(this.model.getBorderSet(), borderComponents, tabComponents, splitterComponents);
+        const borderComponents: React.ReactNode[] = this.renderBorder(
+            this.model.getBorderSet(),
+            tabComponents,
+            splitterComponents,
+        );
         this.renderChildren(this.model.getRoot(), tabSetComponents, tabComponents, splitterComponents);
 
         const nextTopIds: string[] = [];
@@ -212,9 +215,9 @@ export class Layout extends React.Component<ILayoutProps, any> {
 
     private renderBorder(
         borderSet: BorderSet,
-        borderComponents: React.ReactNode[],
         tabComponents: Dictionary<React.ReactNode>,
-        splitterComponents: React.ReactNode[]) {
+        splitterComponents: React.ReactNode[]): React.ReactNode[] {
+        const borderComponents: React.ReactNode[] = [];
         for (const border of borderSet.getBorders()) {
             if (border.isShowing()) {
                 borderComponents.push(
@@ -227,7 +230,6 @@ export class Layout extends React.Component<ILayoutProps, any> {
                 const drawChildren = border._getDrawChildren();
                 for (let i = 0; i < drawChildren.length; i++) {
                     const child = drawChildren[i];
-
                     if (child instanceof SplitterNode) {
                         splitterComponents.push(<Splitter key={child.getId()} layout={this} node={child} />);
                     } else if (child instanceof TabNode) {
@@ -244,6 +246,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
                 }
             }
         }
+        return borderComponents;
     }
 
     private renderChildren(
