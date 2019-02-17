@@ -1,41 +1,50 @@
 import * as React from "react";
-import Border from "../model/BorderNode";
-import { BorderButton } from "./BorderButton";
 import * as DockLocation from "../DockLocation";
-import Layout from "./Layout";
+import Border from "../model/BorderNode";
 import TabNode from "../model/TabNode";
+import { BorderButton } from "./BorderButton";
+import Layout from "./Layout";
 
 export interface IBorderTabSetProps {
-    border: Border,
-    layout: Layout
+    border: Border;
+    layout: Layout;
 }
 
 export const BorderTabSet = (props: IBorderTabSetProps) => {
-    let cm = props.layout.getClassName;
+    const cm = props.layout.getClassName;
 
     const border = props.border;
     const style = border.getTabHeaderRect()!.styleWithPosition({});
     const tabs = [];
     if (border.getLocation() !== DockLocation.LEFT) {
         for (let i = 0; i < border.getChildren().length; i++) {
-            let isSelected = border.getSelected() === i;
-            let child = border.getChildren()[i] as TabNode;
-            tabs.push(<BorderButton layout={props.layout}
-                border={border.getLocation().name}
-                node={child}
-                key={child.getId()}
-                selected={isSelected} />);
+            const isSelected = border.getSelected() === i;
+            const child = border.getChildren()[i] as TabNode;
+            const borderButton = (
+                <BorderButton
+                    layout={props.layout}
+                    border={border.getLocation().name}
+                    node={child}
+                    key={child.getId()}
+                    selected={isSelected}
+                />
+            );
+            tabs.push(borderButton);
         }
-    }
-    else {
+    } else {
         for (let i = border.getChildren().length - 1; i >= 0; i--) {
-            let isSelected = border.getSelected() === i;
-            let child = border.getChildren()[i] as TabNode;
-            tabs.push(<BorderButton layout={props.layout}
-                border={border.getLocation().name}
-                node={child}
-                key={child.getId()}
-                selected={isSelected} />);
+            const isSelected = border.getSelected() === i;
+            const child = border.getChildren()[i] as TabNode;
+            const borderButton = (
+                <BorderButton
+                    layout={props.layout}
+                    border={border.getLocation().name}
+                    node={child}
+                    key={child.getId()}
+                    selected={isSelected}
+                />
+            );
+            tabs.push(borderButton);
         }
     }
 
@@ -45,23 +54,29 @@ export const BorderTabSet = (props: IBorderTabSetProps) => {
     }
 
     // allow customization of tabset right/bottom buttons
-    let buttons: Array<any> = [];
-    const renderState = { headerContent: {}, buttons: buttons };
+    let buttons: any[] = [];
+    const renderState = { headerContent: {}, buttons };
     props.layout.customizeTabSet(border, renderState);
     buttons = renderState.buttons;
 
-    const toolbar = <div
-        key="toolbar"
-        className={cm("flexlayout__border_toolbar_" + border.getLocation().name)}>
-        {buttons}
-    </div>;
-
-    return <div
-        style={style}
-        className={borderClasses}>
-        <div className={cm("flexlayout__border_inner_" + border.getLocation().name)}>
-            {tabs}
+    const toolbar = (
+        <div
+            key="toolbar"
+            className={cm("flexlayout__border_toolbar_" + border.getLocation().name)}
+        >
+            {buttons}
         </div>
-        {toolbar}
-    </div>;
+    );
+
+    return (
+        <div
+            style={style}
+            className={borderClasses}
+        >
+            <div className={cm("flexlayout__border_inner_" + border.getLocation().name)}>
+                {tabs}
+            </div>
+            {toolbar}
+        </div>
+    );
 };

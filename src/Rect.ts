@@ -3,6 +3,10 @@ import { Dictionary } from "./Types";
 
 class Rect {
 
+    public static empty() {
+        return new Rect(0, 0, 0, 0);
+    }
+
     public x: number;
     public y: number;
     public width: number;
@@ -15,39 +19,34 @@ class Rect {
         this.height = height;
     }
 
-    static empty() {
-        return new Rect(0, 0, 0, 0);
-    }
-
-    clone() {
+    public clone() {
         return new Rect(this.x, this.y, this.width, this.height);
     }
 
-    equals(rect: Rect) {
+    public equals(rect: Rect) {
         if (this.x === rect.x
             && this.y === rect.y
             && this.width === rect.width
             && this.height === rect.height) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    getBottom() {
+    public getBottom() {
         return this.y + this.height;
     }
 
-    getRight() {
+    public getRight() {
         return this.x + this.width;
     }
 
-    positionElement(element: HTMLElement) {
+    public positionElement(element: HTMLElement) {
         this.styleWithPosition(element.style);
     }
 
-    styleWithPosition(style: Dictionary<any>) {
+    public styleWithPosition(style: Dictionary<any>) {
         style.left = this.x + "px";
         style.top = this.y + "px";
         style.width = Math.max(0, this.width) + "px"; // need Math.max to prevent -ve, cause error in IE
@@ -56,17 +55,16 @@ class Rect {
         return style;
     }
 
-    contains(x: number, y: number) {
+    public contains(x: number, y: number) {
         if (this.x <= x && x <= this.getRight()
             && this.y <= y && y <= this.getBottom()) {
             return true;
-        }
-        else {
+        } else {
             return false;
         }
     }
 
-    removeInsets(insets : {top: number, left: number, bottom: number, right: number}) {
+    public removeInsets(insets: {top: number, left: number, bottom: number, right: number}) {
         return new Rect(
             this.x + insets.left,
             this.y + insets.top,
@@ -74,13 +72,13 @@ class Rect {
             Math.max(0, this.height - insets.top - insets.bottom));
     }
 
-    centerInRect(outerRect: Rect) {
+    public centerInRect(outerRect: Rect) {
         this.x = (outerRect.width - this.width) / 2;
         this.y = (outerRect.height - this.height) / 2;
     }
 
     /** @hidden @internal */
-    _getSize(orientation: Orientation) {
+    public _getSize(orientation: Orientation) {
         let prefSize = this.width;
         if (orientation === Orientation.VERT) {
             prefSize = this.height;
@@ -88,10 +86,9 @@ class Rect {
         return prefSize;
     }
 
-    toString() {
+    public toString() {
         return "(Rect: x=" + this.x + ", y=" + this.y + ", width=" + this.width + ", height=" + this.height + ")";
     }
 }
 
 export default Rect;
-

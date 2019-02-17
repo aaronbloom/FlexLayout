@@ -2,38 +2,38 @@ import * as React from "react";
 import * as ReactDOM from "react-dom";
 import * as FlexLayout from "../../src/index";
 
-var json = {
+const json = {
     global: {},
     layout: {
-        "type": "row",
-        "weight": 100,
-        "children": [
+        type: "row",
+        weight: 100,
+        children: [
             {
-                "type": "tabset",
-                "weight": 50,
-                "selected": 0,
-                "children": [
+                type: "tabset",
+                weight: 50,
+                selected: 0,
+                children: [
                     {
-                        "type": "tab",
-                        "name": "FX",
-                        "component": "button"
-                    }
-                ]
+                        type: "tab",
+                        name: "FX",
+                        component: "button",
+                    },
+                ],
             },
             {
-                "type": "tabset",
-                "weight": 50,
-                "selected": 0,
-                "children": [
+                type: "tabset",
+                weight: 50,
+                selected: 0,
+                children: [
                     {
-                        "type": "tab",
-                        "name": "FI",
-                        "component": "button"
-                    }
-                ]
-            }
-        ]
-    }
+                        type: "tab",
+                        name: "FI",
+                        component: "button",
+                    },
+                ],
+            },
+        ],
+    },
 };
 
 interface MainProps { }
@@ -49,14 +49,6 @@ class Main extends React.Component<MainProps, MainState> {
         this.state = { model: FlexLayout.Model.fromJson(json) };
     }
 
-    private factory(node: FlexLayout.TabNode) {
-        var component = node.getComponent();
-        if (component === "button") {
-            return <button>{node.getName()}</button>;
-        }
-        return null;
-    }
-
     public render() {
         return (
             <FlexLayout.Layout
@@ -64,6 +56,14 @@ class Main extends React.Component<MainProps, MainState> {
                 factory={this.factory.bind(this)}
             />
         );
+    }
+
+    private factory(node: FlexLayout.TabNode) {
+        const component = node.getComponent();
+        if (component === "button") {
+            return <button>{node.getName()}</button>;
+        }
+        return null;
     }
 }
 

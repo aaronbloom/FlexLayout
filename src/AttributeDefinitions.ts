@@ -4,42 +4,47 @@ import { Dictionary } from "./Types";
 /** @hidden @internal */
 class AttributeDefinitions {
 
-    attributes: Array<Attribute>;
-    nameToAttribute: Dictionary<Attribute>;
+    public attributes: Attribute[];
+    public nameToAttribute: Dictionary<Attribute>;
 
     constructor() {
         this.attributes = [];
         this.nameToAttribute = {};
     }
 
-    addWithAll(name: string, modelName: string | undefined, defaultValue: any, alwaysWriteJson?: boolean) {
-        let attr = new Attribute(name, modelName, defaultValue, alwaysWriteJson);
+    public addWithAll(
+        name: string,
+        modelName: string | undefined,
+        defaultValue: any,
+        alwaysWriteJson: boolean = false,
+    ) {
+        const attr = new Attribute(name, modelName, defaultValue, alwaysWriteJson);
         this.attributes.push(attr);
         this.nameToAttribute[name] = attr;
         return attr;
     }
 
-    addInherited(name: string, modelName: string) {
+    public addInherited(name: string, modelName: string) {
         return this.addWithAll(name, modelName, undefined, false);
     }
 
-    add(name: string, defaultValue: any, alwaysWriteJson?: boolean) {
+    public add(name: string, defaultValue: any, alwaysWriteJson: boolean = false) {
         return this.addWithAll(name, undefined, defaultValue, alwaysWriteJson);
     }
 
-    getAttributes() {
+    public getAttributes() {
         return this.attributes;
     }
 
-    getModelName(name: string) {
-        let conversion = this.nameToAttribute[name];
+    public getModelName(name: string) {
+        const conversion = this.nameToAttribute[name];
         if (conversion !== undefined) {
             return conversion.modelName;
         }
         return undefined;
     }
 
-    toJson(jsonObj: any, obj: any) {
+    public toJson(jsonObj: any, obj: any) {
         this.attributes.forEach((attr) => {
             const fromValue = obj[attr.name];
             if (attr.alwaysWriteJson || fromValue !== attr.defaultValue) {
@@ -48,19 +53,16 @@ class AttributeDefinitions {
         });
     }
 
-    fromJson(jsonObj: any, obj: any) {
+    public fromJson(jsonObj: any, obj: any) {
         this.attributes.forEach((attr) => {
             const fromValue = jsonObj[attr.name];
-            if (fromValue === undefined) {
-                obj[attr.name] = attr.defaultValue;
-            }
-            else {
-                obj[attr.name] = fromValue;
-            }
+            obj[attr.name] = (fromValue === undefined)
+                ? obj[attr.name] = attr.defaultValue
+                : obj[attr.name] = fromValue;
         });
     }
 
-    update(jsonObj: any, obj: any) {
+    public update(jsonObj: any, obj: any) {
         this.attributes.forEach((attr) => {
 
             const fromValue = jsonObj[attr.name];
@@ -70,7 +72,7 @@ class AttributeDefinitions {
         });
     }
 
-    setDefaults(obj: any) {
+    public setDefaults(obj: any) {
         this.attributes.forEach((attr) => {
             obj[attr.name] = attr.defaultValue;
         });

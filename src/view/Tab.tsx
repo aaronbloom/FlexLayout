@@ -1,75 +1,67 @@
 import * as React from "react";
-import TabSetNode from "../model/TabSetNode";
-import TabNode from "../model/TabNode";
 import Actions from "../model/Actions";
-import Layout from "./Layout";
+import TabNode from "../model/TabNode";
+import TabSetNode from "../model/TabSetNode";
 import { Dictionary } from "../Types";
+import Layout from "./Layout";
 
 /** @hidden @internal */
 export interface ITabProps {
-    layout: Layout,
-    selected: boolean,
-    node: TabNode,
-    factory: (node:TabNode) => React.ReactNode
+    layout: Layout;
+    selected: boolean;
+    node: TabNode;
+    factory: (node: TabNode) => React.ReactNode;
 }
 
 /** @hidden @internal */
 export class Tab extends React.Component<ITabProps, any> {
 
-    constructor(props:ITabProps) {
+    constructor(props: ITabProps) {
         super(props);
-        this.state = {renderComponent: !props.node.isEnableRenderOnDemand() || props.selected};
+        this.state = { renderComponent: !props.node.isEnableRenderOnDemand() || props.selected };
     }
 
-    componentDidMount() {
-        //console.log("mount " + this.props.node.getName());
-    }
-
-    componentWillUnmount() {
-        //console.log("unmount " + this.props.node.getName());
-    }
-
-    componentWillReceiveProps(newProps: ITabProps) {
+    public componentWillReceiveProps(newProps: ITabProps) {
         if (!this.state.renderComponent && newProps.selected) {
             // load on demand
-            //console.log("load on demand: " + this.props.node.getName());
-            this.setState({renderComponent: true});
+            this.setState({ renderComponent: true });
         }
     }
 
-    onMouseDown(event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) {
+    public onMouseDown(event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) {
         const parent = this.props.node.getParent() as TabSetNode;
-        if (parent.getType() === TabSetNode.TYPE) {
-            if (!parent.isActive()) {
-                this.props.layout.doAction(Actions.setActiveTabset(parent.getId()));
-            }
+        if (parent.getType() === TabSetNode.TYPE && !parent.isActive()) {
+            this.props.layout.doAction(Actions.setActiveTabset(parent.getId()));
         }
     }
 
-    render() {
-        let cm = this.props.layout.getClassName;
+    public render() {
+        const cm = this.props.layout.getClassName;
 
         const node = this.props.node;
         const parentNode = node.getParent() as TabSetNode;
-        const style:Dictionary<any> = node._styleWithPosition({
-            display: this.props.selected ? "block" : "none"
+        const style: Dictionary<any> = node._styleWithPosition({
+            display: this.props.selected ? "block" : "none",
         });
 
         if (parentNode.isMaximized()) {
             style.zIndex = 100;
         }
 
-        let child = undefined;
+        let child;
         if (this.state.renderComponent) {
             child = this.props.factory(node);
         }
 
-        return <div className={cm("flexlayout__tab")}
-                    onMouseDown={this.onMouseDown.bind(this)}
-                    onTouchStart={this.onMouseDown.bind(this)}
-                    style={style}>{child}
-        </div>;
+        return (
+            <div
+                className={cm("flexlayout__tab")}
+                onMouseDown={this.onMouseDown.bind(this)}
+                onTouchStart={this.onMouseDown.bind(this)}
+                style={style}
+            >
+                {child}
+            </div>
+        );
     }
 }
-
-// export default Tab;

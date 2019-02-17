@@ -1,32 +1,35 @@
 import * as React from "react";
 import * as ReactDOM from "react-dom";
+import DragDrop from "../DragDrop";
+import Action from "../model/Action";
+import Actions from "../model/Actions";
+import BorderNode from "../model/BorderNode";
+import BorderSet from "../model/BorderSet";
+import IDraggable from "../model/IDraggable";
+import Model from "../model/Model";
+import Node from "../model/Node";
+import RowNode from "../model/RowNode";
+import SplitterNode from "../model/SplitterNode";
+import TabNode from "../model/TabNode";
+import TabSetNode from "../model/TabSetNode";
+import Rect from "../Rect";
+import { Dictionary } from "../Types";
+import { BorderTabSet } from "./BorderTabSet";
 import { Splitter } from "./Splitter";
 import { Tab } from "./Tab";
 import { TabSet } from "./TabSet";
-import { BorderTabSet } from "./BorderTabSet";
-import DragDrop from "../DragDrop";
-import Rect from "../Rect";
-import Node from "../model/Node";
-import RowNode from "../model/RowNode";
-import TabNode from "../model/TabNode";
-import TabSetNode from "../model/TabSetNode";
-import BorderNode from "../model/BorderNode";
-import SplitterNode from "../model/SplitterNode";
-import Actions from "../model/Actions";
-import Action from "../model/Action";
-import Model from "../model/Model";
-import BorderSet from "../model/BorderSet";
-import { Dictionary } from "../Types";
-import IDraggable from "../model/IDraggable";
 
 export interface ILayoutProps {
-    model: Model,
-    factory: (node: TabNode) => React.ReactNode,
-    onAction?: (action: Action) => void,
-    onRenderTab?: (node: TabNode, renderValues: { leading: React.ReactNode, content: React.ReactNode }) => void,
-    onRenderTabSet?: (tabSetNode: (TabSetNode | BorderNode), renderValues: { headerContent?: React.ReactNode, buttons: Array<React.ReactNode> }) => void,
-    onModelChange?: (model: Model) => void,
-    classNameMapper?: (defaultClassName: string) => string
+    model: Model;
+    factory: (node: TabNode) => React.ReactNode;
+    onAction?: (action: Action) => void;
+    onRenderTab?: (node: TabNode, renderValues: { leading: React.ReactNode, content: React.ReactNode }) => void;
+    onRenderTabSet?: (
+        tabSetNode: (TabSetNode | BorderNode),
+        renderValues: { headerContent?: React.ReactNode, buttons: React.ReactNode[] },
+    ) => void;
+    onModelChange?: (model: Model) => void;
+    classNameMapper?: (defaultClassName: string) => string;
 }
 
 /**
@@ -42,7 +45,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
     // private start: number = 0;
     // private layoutTime: number = 0;
 
-    private tabIds: Array<string>;
+    private tabIds: string[];
     private newTabJson: any;
     private firstMove: boolean = false;
     private dragNode?: (Node & IDraggable);
@@ -67,18 +70,10 @@ export class Layout extends React.Component<ILayoutProps, any> {
         this.tabIds = [];
     }
 
-    private onModelChange() {
-        this.forceUpdate();
-        if (this.props.onModelChange) {
-            this.props.onModelChange(this.model!)
-        }
-    }
-
     public doAction(action: Action): void {
         if (this.props.onAction !== undefined) {
             this.props.onAction(action);
-        }
-        else {
+        } else {
             this.model!.doAction(action);
         }
     }
@@ -103,16 +98,6 @@ export class Layout extends React.Component<ILayoutProps, any> {
 
     public componentDidUpdate() {
         this.updateRect();
-        //console.log("Layout time: " + this.layoutTime + "ms Render time: " + (Date.now() - this.start) + "ms");
-    }
-
-    private updateRect() {
-        const domRect = this.selfRef!.getBoundingClientRect();
-        const rect = new Rect(0, 0, domRect.width, domRect.height);
-        if (!rect.equals(this.rect)) {
-            this.rect = rect;
-            this.forceUpdate();
-        }
     }
 
     public getClassName(defaultClassName: string) {
@@ -128,22 +113,21 @@ export class Layout extends React.Component<ILayoutProps, any> {
     }
 
     public render() {
-        // this.start = Date.now();
-        const borderComponents: Array<React.ReactNode> = [];
-        const tabSetComponents: Array<React.ReactNode> = [];
+        const borderComponents: React.ReactNode[] = [];
+        const tabSetComponents: React.ReactNode[] = [];
         const tabComponents: Dictionary<React.ReactNode> = {};
-        const splitterComponents: Array<React.ReactNode> = [];
+        const splitterComponents: React.ReactNode[] = [];
 
         this.centerRect = this.model!._layout(this.rect);
 
         this.renderBorder(this.model!.getBorderSet(), borderComponents, tabComponents, splitterComponents);
         this.renderChildren(this.model!.getRoot(), tabSetComponents, tabComponents, splitterComponents);
 
-        const nextTopIds: Array<string> = [];
+        const nextTopIds: string[] = [];
         const nextTopIdsMap: Dictionary<string> = {};
 
         // Keep any previous tabs in the same DOM order as before, removing any that have been deleted
-        this.tabIds.forEach(t => {
+        this.tabIds.forEach((t) => {
             if (tabComponents[t]) {
                 nextTopIds.push(t);
                 nextTopIdsMap[t] = t;
@@ -152,78 +136,151 @@ export class Layout extends React.Component<ILayoutProps, any> {
         this.tabIds = nextTopIds;
 
         // Add tabs that have been added to the DOM
-        Object.keys(tabComponents).forEach(t => {
+        Object.keys(tabComponents).forEach((t) => {
             if (!nextTopIdsMap[t]) {
                 this.tabIds.push(t);
             }
         });
 
-        // this.layoutTime = (Date.now() - this.start);
-
         return (
-            <div ref={self => this.selfRef = (self === null) ? undefined : self} className={this.getClassName("flexlayout__layout")}>
+            <div
+                ref={(self) => this.selfRef = (self === null) ? undefined : self}
+                className={this.getClassName("flexlayout__layout")}
+            >
                 {tabSetComponents}
-                {this.tabIds.map(t => tabComponents[t])}
+                {this.tabIds.map((t) => tabComponents[t])}
                 {borderComponents}
                 {splitterComponents}
             </div>
         );
     }
 
-    private renderBorder(borderSet: BorderSet, borderComponents: Array<React.ReactNode>, tabComponents: Dictionary<React.ReactNode>, splitterComponents: Array<React.ReactNode>) {
-        for (let i = 0; i < borderSet.getBorders().length; i++) {
-            const border = borderSet.getBorders()[i];
+    public dragStart(
+        event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement> | undefined,
+        dragDivText: string,
+        node: (Node & IDraggable),
+        allowDrag: boolean,
+        onClick?: (event: React.SyntheticEvent<HTMLElement> | Event) => void,
+        onDoubleClick?: (event: React.SyntheticEvent<HTMLElement> | Event) => void) {
+        if (this.model!.getMaximizedTabset() !== undefined || !allowDrag) {
+            DragDrop.instance.startDrag(event, undefined, undefined, undefined, undefined, onClick, onDoubleClick);
+        } else {
+            this.dragNode = node;
+            this.dragDivText = dragDivText;
+            DragDrop.instance.startDrag(
+                event,
+                this.onDragStart.bind(this),
+                this.onDragMove.bind(this),
+                this.onDragEnd.bind(this),
+                this.onCancelDrag.bind(this),
+                onClick,
+                onDoubleClick,
+            );
+        }
+    }
+
+    public maximize(tabsetNode: TabSetNode) {
+        this.doAction(Actions.maximizeToggle(tabsetNode.getId()));
+    }
+
+    public customizeTab(tabNode: TabNode, renderValues: { leading: React.ReactNode, content: React.ReactNode }) {
+        if (this.props.onRenderTab) {
+            this.props.onRenderTab(tabNode, renderValues);
+        }
+    }
+
+    public customizeTabSet(
+        tabSetNode: (TabSetNode | BorderNode),
+        renderValues: { headerContent?: React.ReactNode, buttons: React.ReactNode[] }) {
+        if (this.props.onRenderTabSet) {
+            this.props.onRenderTabSet(tabSetNode, renderValues);
+        }
+    }
+
+    private onModelChange() {
+        this.forceUpdate();
+        if (this.props.onModelChange) {
+            this.props.onModelChange(this.model!);
+        }
+    }
+
+    private updateRect() {
+        const domRect = this.selfRef!.getBoundingClientRect();
+        const rect = new Rect(0, 0, domRect.width, domRect.height);
+        if (!rect.equals(this.rect)) {
+            this.rect = rect;
+            this.forceUpdate();
+        }
+    }
+
+    private renderBorder(
+        borderSet: BorderSet,
+        borderComponents: React.ReactNode[],
+        tabComponents: Dictionary<React.ReactNode>,
+        splitterComponents: React.ReactNode[]) {
+        for (const border of borderSet.getBorders()) {
             if (border.isShowing()) {
-                borderComponents.push(<BorderTabSet key={"border_" + border.getLocation().name} border={border}
-                    layout={this} />);
+                borderComponents.push(
+                    <BorderTabSet
+                        key={"border_" + border.getLocation().name}
+                        border={border}
+                        layout={this}
+                    />,
+                );
                 const drawChildren = border._getDrawChildren();
                 for (let i = 0; i < drawChildren.length; i++) {
                     const child = drawChildren[i];
 
                     if (child instanceof SplitterNode) {
-                        splitterComponents.push(<Splitter key={child.getId()} layout={this} node={child}></Splitter>);
-                    }
-                    else if (child instanceof TabNode) {
-                        tabComponents[child.getId()] = <Tab
-                            key={child.getId()}
-                            layout={this}
-                            node={child}
-                            selected={i === border.getSelected()}
-                            factory={this.props.factory}>
-                        </Tab>;
+                        splitterComponents.push(<Splitter key={child.getId()} layout={this} node={child} />);
+                    } else if (child instanceof TabNode) {
+                        tabComponents[child.getId()] = (
+                            <Tab
+                                key={child.getId()}
+                                layout={this}
+                                node={child}
+                                selected={i === border.getSelected()}
+                                factory={this.props.factory}
+                            />
+                        );
                     }
                 }
             }
         }
     }
 
-    private renderChildren(node: (RowNode | TabSetNode), tabSetComponents: Array<React.ReactNode>, tabComponents: Dictionary<React.ReactNode>, splitterComponents: Array<React.ReactNode>) {
+    private renderChildren(
+        node: (RowNode | TabSetNode),
+        tabSetComponents: React.ReactNode[],
+        tabComponents: Dictionary<React.ReactNode>,
+        splitterComponents: React.ReactNode[]) {
         const drawChildren = node._getDrawChildren();
+        if (drawChildren === undefined) {
+            return;
+        }
 
-        for (let i = 0; i < drawChildren!.length; i++) {
-            const child = drawChildren![i];
-
+        for (const child of drawChildren) {
             if (child instanceof SplitterNode) {
-                splitterComponents.push(<Splitter key={child.getId()} layout={this} node={child}></Splitter>);
-            }
-            else if (child instanceof TabSetNode) {
-                tabSetComponents.push(<TabSet key={child.getId()} layout={this} node={child}></TabSet>);
+                splitterComponents.push(<Splitter key={child.getId()} layout={this} node={child} />);
+            } else if (child instanceof TabSetNode) {
+                tabSetComponents.push(<TabSet key={child.getId()} layout={this} node={child} />);
                 this.renderChildren(child, tabSetComponents, tabComponents, splitterComponents);
-            }
-            else if (child instanceof TabNode) {
+            } else if (child instanceof TabNode) {
                 const selectedTab = child.getParent()!.getChildren()[(child.getParent() as TabSetNode).getSelected()];
                 if (selectedTab === undefined) {
-                    debugger; // this should not happen!
+                    // tslint:disable-next-line:no-console
+                    console.error("this should not happen");
                 }
-                tabComponents[child.getId()] = <Tab
-                    key={child.getId()}
-                    layout={this}
-                    node={child}
-                    selected={child === selectedTab}
-                    factory={this.props.factory}>
-                </Tab>;
-            }
-            else {// is row
+                tabComponents[child.getId()] = (
+                    <Tab
+                        key={child.getId()}
+                        layout={this}
+                        node={child}
+                        selected={child === selectedTab}
+                        factory={this.props.factory}
+                    />
+                );
+            } else {// is row
                 this.renderChildren(child as RowNode, tabSetComponents, tabComponents, splitterComponents);
             }
         }
@@ -236,46 +293,25 @@ export class Layout extends React.Component<ILayoutProps, any> {
             try {
                 rootdiv.removeChild(this.outlineDiv!);
             } catch (e) {
+                // tslint:disable-next-line:no-console
+                console.error(e);
             }
 
             try {
                 rootdiv.removeChild(this.dragDiv!);
             } catch (e) {
+                // tslint:disable-next-line:no-console
+                console.error(e);
             }
 
             this.dragDiv = undefined;
             this.hideEdges(rootdiv);
-            if (this.fnNewNodeDropped != undefined) {
+            if (this.fnNewNodeDropped !== undefined) {
                 this.fnNewNodeDropped();
                 this.fnNewNodeDropped = undefined;
             }
             DragDrop.instance.hideGlass();
             this.newTabJson = undefined;
-        }
-    }
-
-    public dragStart(
-        event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement> | undefined,
-        dragDivText: string,
-        node: (Node & IDraggable),
-        allowDrag: boolean,
-        onClick?: (event: React.SyntheticEvent<HTMLElement> | Event) => void,
-        onDoubleClick?: (event: React.SyntheticEvent<HTMLElement> | Event) => void) {
-        if (this.model!.getMaximizedTabset() !== undefined || !allowDrag) {
-            DragDrop.instance.startDrag(event, undefined, undefined, undefined, undefined, onClick, onDoubleClick);
-        }
-        else {
-            this.dragNode = node;
-            this.dragDivText = dragDivText;
-            DragDrop.instance.startDrag(
-                event,
-                this.onDragStart.bind(this),
-                this.onDragMove.bind(this),
-                this.onDragEnd.bind(this),
-                this.onCancelDrag.bind(this),
-                onClick,
-                onDoubleClick
-            );
         }
     }
 
@@ -286,7 +322,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
         this.outlineDiv.className = this.getClassName("flexlayout__outline_rect");
         rootdiv.appendChild(this.outlineDiv);
 
-        if (this.dragDiv == undefined) {
+        if (this.dragDiv === undefined) {
             this.dragDiv = document.createElement("div");
             this.dragDiv.className = this.getClassName("flexlayout__drag_rect");
             this.dragDiv.innerHTML = this.dragDivText;
@@ -295,7 +331,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
         // add edge indicators
         this.showEdges(rootdiv);
 
-        if (this.dragNode !== undefined && this.dragNode instanceof TabNode && this.dragNode.getTabRect() !== undefined) {
+        if (this.dragNode instanceof TabNode && this.dragNode.getTabRect() !== undefined) {
             this.dragNode.getTabRect()!.positionElement(this.outlineDiv);
         }
         this.firstMove = true;
@@ -312,7 +348,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
         const clientRect = this.selfRef!.getBoundingClientRect();
         const pos = {
             x: (event as any).clientX - clientRect.left,
-            y: (event as any).clientY - clientRect.top
+            y: (event as any).clientY - clientRect.top,
         };
 
         this.dragDiv!.style.left = (pos.x - this.dragDiv!.getBoundingClientRect().width / 2) + "px";
@@ -336,16 +372,26 @@ export class Layout extends React.Component<ILayoutProps, any> {
 
         if (this.dropInfo) {
             if (this.newTabJson !== undefined) {
-                this.doAction(Actions.addNode(this.newTabJson, this.dropInfo.node.getId(), this.dropInfo.location, this.dropInfo.index));
-
-                if (this.fnNewNodeDropped != undefined) {
+                const action = Actions.addNode(
+                    this.newTabJson,
+                    this.dropInfo.node.getId(),
+                    this.dropInfo.location,
+                    this.dropInfo.index,
+                );
+                this.doAction(action);
+                if (this.fnNewNodeDropped !== undefined) {
                     this.fnNewNodeDropped();
                     this.fnNewNodeDropped = undefined;
                 }
                 this.newTabJson = undefined;
-            }
-            else if (this.dragNode !== undefined) {
-                this.doAction(Actions.moveNode(this.dragNode.getId(), this.dropInfo.node.getId(), this.dropInfo.location, this.dropInfo.index));
+            } else if (this.dragNode !== undefined) {
+                const action = Actions.moveNode(
+                    this.dragNode.getId(),
+                    this.dropInfo.node.getId(),
+                    this.dropInfo.location,
+                    this.dropInfo.index,
+                );
+                this.doAction(action);
             }
 
         }
@@ -410,25 +456,10 @@ export class Layout extends React.Component<ILayoutProps, any> {
                 rootdiv.removeChild(this.edgeLeftDiv!);
                 rootdiv.removeChild(this.edgeBottomDiv!);
                 rootdiv.removeChild(this.edgeRightDiv!);
+            } catch (e) {
+                // tslint:disable-next-line:no-console
+                console.error(e);
             }
-            catch (e) {
-            }
-        }
-    }
-
-    public maximize(tabsetNode: TabSetNode) {
-        this.doAction(Actions.maximizeToggle(tabsetNode.getId()));
-    }
-
-    public customizeTab(tabNode: TabNode, renderValues: { leading: React.ReactNode, content: React.ReactNode }) {
-        if (this.props.onRenderTab) {
-            this.props.onRenderTab(tabNode, renderValues);
-        }
-    }
-
-    public customizeTabSet(tabSetNode: (TabSetNode | BorderNode), renderValues: { headerContent?: React.ReactNode, buttons: Array<React.ReactNode> }) {
-        if (this.props.onRenderTabSet) {
-            this.props.onRenderTabSet(tabSetNode, renderValues);
         }
     }
 }
