@@ -1,5 +1,4 @@
 import AttributeDefinitions from "../AttributeDefinitions";
-import Orientation from "../Orientation";
 import Model from "./Model";
 import Node from "./Node";
 
@@ -27,14 +26,14 @@ class SplitterNode extends Node {
     }
 
     // tslint:disable-next-line:no-empty
-    public _setWeight(value: number): void {}
+    public _setWeight(): void {}
 
-    public _getPrefSize(orientation: Orientation): number {
+    public _getPrefSize(): number {
         return this._model.getSplitterSize();
     }
 
     // tslint:disable-next-line:no-empty
-    public _updateAttrs(json: any): void {}
+    public _updateAttrs(): void {}
 
     public _getAttributeDefinitions(): AttributeDefinitions {
         return new AttributeDefinitions();

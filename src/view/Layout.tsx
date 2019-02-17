@@ -38,12 +38,9 @@ export interface ILayoutProps {
 export class Layout extends React.Component<ILayoutProps, any> {
     private selfRef?: HTMLDivElement;
 
-    private model?: Model;
+    private model: Model;
     private rect: Rect;
     private centerRect?: Rect;
-
-    // private start: number = 0;
-    // private layoutTime: number = 0;
 
     private tabIds: string[];
     private newTabJson: any;
@@ -60,7 +57,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
     private edgeTopDiv?: HTMLDivElement;
     private fnNewNodeDropped?: (() => void);
 
-    constructor(props: ILayoutProps) {
+    public constructor(props: ILayoutProps) {
         super(props);
         this.model = this.props.model;
         this.rect = new Rect(0, 0, 0, 0);
@@ -74,7 +71,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
         if (this.props.onAction !== undefined) {
             this.props.onAction(action);
         } else {
-            this.model!.doAction(action);
+            this.model.doAction(action);
         }
     }
 
@@ -118,10 +115,10 @@ export class Layout extends React.Component<ILayoutProps, any> {
         const tabComponents: Dictionary<React.ReactNode> = {};
         const splitterComponents: React.ReactNode[] = [];
 
-        this.centerRect = this.model!._layout(this.rect);
+        this.centerRect = this.model._layout(this.rect);
 
-        this.renderBorder(this.model!.getBorderSet(), borderComponents, tabComponents, splitterComponents);
-        this.renderChildren(this.model!.getRoot(), tabSetComponents, tabComponents, splitterComponents);
+        this.renderBorder(this.model.getBorderSet(), borderComponents, tabComponents, splitterComponents);
+        this.renderChildren(this.model.getRoot(), tabSetComponents, tabComponents, splitterComponents);
 
         const nextTopIds: string[] = [];
         const nextTopIdsMap: Dictionary<string> = {};
@@ -162,7 +159,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
         allowDrag: boolean,
         onClick?: (event: React.SyntheticEvent<HTMLElement> | Event) => void,
         onDoubleClick?: (event: React.SyntheticEvent<HTMLElement> | Event) => void) {
-        if (this.model!.getMaximizedTabset() !== undefined || !allowDrag) {
+        if (this.model.getMaximizedTabset() !== undefined || !allowDrag) {
             DragDrop.instance.startDrag(event, undefined, undefined, undefined, undefined, onClick, onDoubleClick);
         } else {
             this.dragNode = node;
@@ -200,7 +197,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
     private onModelChange() {
         this.forceUpdate();
         if (this.props.onModelChange) {
-            this.props.onModelChange(this.model!);
+            this.props.onModelChange(this.model);
         }
     }
 
@@ -237,9 +234,9 @@ export class Layout extends React.Component<ILayoutProps, any> {
                         tabComponents[child.getId()] = (
                             <Tab
                                 key={child.getId()}
-                                layout={this}
                                 node={child}
                                 selected={i === border.getSelected()}
+                                onAction={this.doAction}
                                 factory={this.props.factory}
                             />
                         );
@@ -274,9 +271,9 @@ export class Layout extends React.Component<ILayoutProps, any> {
                 tabComponents[child.getId()] = (
                     <Tab
                         key={child.getId()}
-                        layout={this}
                         node={child}
                         selected={child === selectedTab}
+                        onAction={this.doAction}
                         factory={this.props.factory}
                     />
                 );
@@ -341,7 +338,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
 
     private onDragMove(event: React.SyntheticEvent<HTMLElement> | Event) {
         if (this.firstMove === false) {
-            const speed = this.model!._getAttribute("tabDragSpeed") as number;
+            const speed = this.model._getAttribute("tabDragSpeed") as number;
             this.outlineDiv!.style.transition = `top ${speed}s, left ${speed}s, width ${speed}s, height ${speed}s`;
         }
         this.firstMove = false;
@@ -354,7 +351,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
         this.dragDiv!.style.left = (pos.x - this.dragDiv!.getBoundingClientRect().width / 2) + "px";
         this.dragDiv!.style.top = pos.y + 5 + "px";
 
-        const dropInfo = this.model!._findDropTargetNode(this.dragNode!, pos.x, pos.y);
+        const dropInfo = this.model._findDropTargetNode(this.dragNode!, pos.x, pos.y);
         if (dropInfo) {
             this.dropInfo = dropInfo;
             this.outlineDiv!.className = this.getClassName(dropInfo.className);
@@ -398,7 +395,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
     }
 
     private showEdges(rootdiv: HTMLElement) {
-        if (this.model!.isEnableEdgeDock()) {
+        if (this.model.isEnableEdgeDock()) {
             const domRect = rootdiv.getBoundingClientRect();
             const r = this.centerRect!;
             const size = 100;
@@ -450,7 +447,7 @@ export class Layout extends React.Component<ILayoutProps, any> {
     }
 
     private hideEdges(rootdiv: HTMLElement) {
-        if (this.model!.isEnableEdgeDock()) {
+        if (this.model.isEnableEdgeDock()) {
             try {
                 rootdiv.removeChild(this.edgeTopDiv!);
                 rootdiv.removeChild(this.edgeLeftDiv!);

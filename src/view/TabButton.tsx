@@ -6,7 +6,6 @@ import TabSetNode from "../model/TabSetNode";
 import Rect from "../Rect";
 import Layout from "./Layout";
 
-/** @hidden @internal */
 export interface ITabButtonProps {
     layout: Layout;
     node: TabNode;
@@ -15,8 +14,11 @@ export interface ITabButtonProps {
     height: number;
 }
 
-/** @hidden @internal */
-export class TabButton extends React.Component<ITabButtonProps, any> {
+interface TabButtonState {
+    readonly editing: boolean;
+}
+
+export class TabButton extends React.Component<ITabButtonProps, TabButtonState> {
     public selfRef?: HTMLDivElement;
 
     public contentWidth: number = 0;
@@ -66,7 +68,7 @@ export class TabButton extends React.Component<ITabButtonProps, any> {
         }
     }
 
-    public onClose(event: React.MouseEvent<HTMLDivElement>) {
+    public onClose() {
         const node = this.props.node;
         this.props.layout.doAction(Actions.deleteTab(node.getId()));
     }

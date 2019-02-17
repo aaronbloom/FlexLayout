@@ -6,21 +6,22 @@ import PopupMenu from "../PopupMenu";
 import Layout from "./Layout";
 import { TabButton } from "./TabButton";
 
-/** @hidden @internal */
 export interface ITabSetProps {
-    layout: Layout;
-    node: TabSetNode;
+    readonly layout: Layout;
+    readonly node: TabSetNode;
 }
 
-/** @hidden @internal */
-export class TabSet extends React.Component<ITabSetProps, any> {
-    public headerRef?: HTMLDivElement;
-    public overflowbuttonRef?: Element;
-    public toolbarRef?: HTMLDivElement;
+interface TabSetState {
+    readonly hideTabsAfter: number;
+}
 
-    public recalcVisibleTabs: boolean;
-    public showOverflow: boolean;
-    public showToolbar: boolean;
+export class TabSet extends React.Component<ITabSetProps, TabSetState> {
+    private overflowbuttonRef?: Element;
+    private toolbarRef?: HTMLDivElement;
+
+    private recalcVisibleTabs: boolean;
+    private showOverflow: boolean;
+    private showToolbar: boolean;
 
     constructor(props: ITabSetProps) {
         super(props);
@@ -38,40 +39,11 @@ export class TabSet extends React.Component<ITabSetProps, any> {
         this.updateVisibleTabs();
     }
 
-    public componentWillReceiveProps(nextProps: ITabSetProps) {
+    public componentWillReceiveProps() {
         this.showToolbar = true;
         this.showOverflow = false;
         this.recalcVisibleTabs = true;
         this.setState({ hideTabsAfter: 999 });
-    }
-
-    public updateVisibleTabs() {
-        const node = this.props.node;
-
-        if (node.isEnableTabStrip() && this.recalcVisibleTabs) {
-            const toolbarWidth = (this.toolbarRef as Element).getBoundingClientRect().width;
-            let hideTabsAfter = 999;
-            for (let i = 0; i < node.getChildren().length; i++) {
-                const child = node.getChildren()[i] as TabNode;
-                if (child.getTabRect()!.getRight() > node.getRect().getRight() - (20 + toolbarWidth)) {
-                    hideTabsAfter = Math.max(0, i - 1);
-                    this.showOverflow = node.getChildren().length > 1;
-
-                    if (i === 0) {
-                        this.showToolbar = false;
-                        if (child.getTabRect()!.getRight() > node.getRect().getRight() - 20) {
-                            this.showOverflow = false;
-                        }
-                    }
-
-                    break;
-                }
-            }
-            if (this.state.hideTabsAfter !== hideTabsAfter) {
-                this.setState({ hideTabsAfter });
-            }
-            this.recalcVisibleTabs = false;
-        }
     }
 
     public render() {
@@ -204,10 +176,7 @@ export class TabSet extends React.Component<ITabSetProps, any> {
                     className={tabStripClasses}
                     style={{ height: node.getTabStripHeight() + "px", top: node.getHeaderHeight() + "px" }}
                 >
-                    <div
-                        ref={(ref) => this.headerRef = (ref === null) ? undefined : ref}
-                        className={cm("flexlayout__tab_header_inner")}
-                    >
+                    <div className={cm("flexlayout__tab_header_inner")}>
                         {tabs}
                     </div>
                 </div>
@@ -220,10 +189,7 @@ export class TabSet extends React.Component<ITabSetProps, any> {
                     onMouseDown={this.onMouseDown.bind(this)}
                     onTouchStart={this.onMouseDown.bind(this)}
                 >
-                    <div
-                        ref={(ref) => this.headerRef = (ref === null) ? undefined : ref}
-                        className={cm("flexlayout__tab_header_inner")}
-                    >
+                    <div className={cm("flexlayout__tab_header_inner")} >
                         {tabs}
                     </div>
                     {toolbar}
@@ -239,16 +205,16 @@ export class TabSet extends React.Component<ITabSetProps, any> {
         );
     }
 
-    public onOverflowClick(hiddenTabs: Array<{ name: string, node: TabNode, index: number }>) {
+    private onOverflowClick(hiddenTabs: Array<{ name: string, node: TabNode, index: number }>) {
         const element = this.overflowbuttonRef as Element;
         PopupMenu.show(element, hiddenTabs, this.onOverflowItemSelect.bind(this), this.props.layout.getClassName);
     }
 
-    public onOverflowItemSelect(item: { name: string, node: TabNode, index: number }) {
+    private onOverflowItemSelect(item: { name: string, node: TabNode, index: number }) {
         this.props.layout.doAction(Actions.selectTab(item.node.getId()));
     }
 
-    public onMouseDown(event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) {
+    private onMouseDown(event: React.MouseEvent<HTMLDivElement> | React.TouchEvent<HTMLDivElement>) {
         const name = this.props.node.getName();
         const newName = (name === undefined) ? "" : ": " + name;
         this.props.layout.doAction(Actions.setActiveTabset(this.props.node.getId()));
@@ -262,17 +228,46 @@ export class TabSet extends React.Component<ITabSetProps, any> {
         );
     }
 
-    public onInterceptMouseDown(event: React.SyntheticEvent<HTMLElement>) {
+    private onInterceptMouseDown(event: React.SyntheticEvent<HTMLElement>) {
         event.stopPropagation();
     }
 
-    public onMaximizeToggle() {
+    private onMaximizeToggle() {
         if (this.props.node.isEnableMaximize()) {
             this.props.layout.maximize(this.props.node);
         }
     }
 
-    public onDoubleClick() {
+    private onDoubleClick() {
         this.onMaximizeToggle();
+    }
+
+    private updateVisibleTabs() {
+        const node = this.props.node;
+
+        if (node.isEnableTabStrip() && this.recalcVisibleTabs) {
+            const toolbarWidth = (this.toolbarRef as Element).getBoundingClientRect().width;
+            let hideTabsAfter = 999;
+            for (let i = 0; i < node.getChildren().length; i++) {
+                const child = node.getChildren()[i] as TabNode;
+                if (child.getTabRect()!.getRight() > node.getRect().getRight() - (20 + toolbarWidth)) {
+                    hideTabsAfter = Math.max(0, i - 1);
+                    this.showOverflow = node.getChildren().length > 1;
+
+                    if (i === 0) {
+                        this.showToolbar = false;
+                        if (child.getTabRect()!.getRight() > node.getRect().getRight() - 20) {
+                            this.showOverflow = false;
+                        }
+                    }
+
+                    break;
+                }
+            }
+            if (this.state.hideTabsAfter !== hideTabsAfter) {
+                this.setState({ hideTabsAfter });
+            }
+            this.recalcVisibleTabs = false;
+        }
     }
 }

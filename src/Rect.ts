@@ -1,5 +1,5 @@
+import { CSSProperties } from "react";
 import Orientation from "./Orientation";
-import { Dictionary } from "./Types";
 
 class Rect {
 
@@ -43,10 +43,10 @@ class Rect {
     }
 
     public positionElement(element: HTMLElement) {
-        this.styleWithPosition(element.style);
+        this.styleWithPosition(element.style as CSSProperties);
     }
 
-    public styleWithPosition(style: Dictionary<any>) {
+    public styleWithPosition(style: CSSProperties): CSSProperties {
         style.left = this.x + "px";
         style.top = this.y + "px";
         style.width = Math.max(0, this.width) + "px"; // need Math.max to prevent -ve, cause error in IE

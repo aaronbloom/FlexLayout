@@ -56,7 +56,6 @@ export const getByName = (name: DockLocationType): DockLocation => {
     return DockLocations[name];
 };
 
-/** @hidden @internal */
 export const getLocation = (rect: Rect, x: number, y: number): DockLocation => {
     if (x < rect.x + rect.width / 4) {
         return LEFT;
@@ -73,7 +72,6 @@ export const getLocation = (rect: Rect, x: number, y: number): DockLocation => {
     return CENTER;
 };
 
-/** @hidden @internal */
 export const getDockRect = (location: DockLocationType, r: Rect): Rect => {
     if (location === "top") {
         return new Rect(r.x, r.y, r.width, r.height / 2);
@@ -90,7 +88,6 @@ export const getDockRect = (location: DockLocationType, r: Rect): Rect => {
     return r.clone();
 };
 
-/** @hidden @internal */
 export const split = (location: DockLocationType, rect: Rect, size: number) => {
     if (location === "top") {
         return {
@@ -116,7 +113,6 @@ export const split = (location: DockLocationType, rect: Rect, size: number) => {
     };
 };
 
-/** @hidden @internal */
 export const reflect = (location: DockLocationType): DockLocation => {
     if (location === "top") {
         return BOTTOM;

@@ -6,8 +6,8 @@ import { BorderButton } from "./BorderButton";
 import Layout from "./Layout";
 
 export interface IBorderTabSetProps {
-    border: Border;
-    layout: Layout;
+    readonly border: Border;
+    readonly layout: Layout;
 }
 
 export const BorderTabSet = (props: IBorderTabSetProps) => {
@@ -54,7 +54,7 @@ export const BorderTabSet = (props: IBorderTabSetProps) => {
     }
 
     // allow customization of tabset right/bottom buttons
-    let buttons: any[] = [];
+    let buttons: React.ReactNode[] = [];
     const renderState = { headerContent: {}, buttons };
     props.layout.customizeTabSet(border, renderState);
     buttons = renderState.buttons;

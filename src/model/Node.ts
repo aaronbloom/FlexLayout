@@ -1,3 +1,4 @@
+import { CSSProperties } from "react";
 import AttributeDefinitions from "../AttributeDefinitions";
 import * as DockLocation from "../DockLocation";
 import DropInfo from "../DropInfo";
@@ -9,28 +10,17 @@ import Model from "./Model";
 
 abstract class Node {
 
-    /** @hidden @internal */
     protected _model: Model;
-    /** @hidden @internal */
     protected _attributes: Dictionary<any>;
-    /** @hidden @internal */
     protected _parent?: Node;
-    /** @hidden @internal */
     protected _children: Node[];
-    /** @hidden @internal */
     protected _fixed: boolean;
-    /** @hidden @internal */
     protected _rect: Rect;
-    /** @hidden @internal */
     protected _visible: boolean;
-    /** @hidden @internal */
     protected _listeners: Dictionary<(params: any) => void>;
-    /** @hidden @internal */
     protected _dirty: boolean = false;
-    /** @hidden @internal */
     protected _tempSize: number = 0;
 
-    /** @hidden @internal */
     protected constructor(model: Model) {
         this._model = model;
         this._attributes = {};
@@ -94,12 +84,10 @@ abstract class Node {
         delete this._listeners[event];
     }
 
-    /** @hidden @internal */
     public _setId(id: string) {
         this._attributes.id = id;
     }
 
-    /** @hidden @internal */
     public _fireEvent(event: string, params: any) {
         const listener = this._listeners[event];
         if (listener !== undefined) {
@@ -107,7 +95,6 @@ abstract class Node {
         }
     }
 
-    /** @hidden @internal */
     public _getAttr(name: string) {
         let val = this._attributes[name];
 
@@ -121,7 +108,6 @@ abstract class Node {
         return val;
     }
 
-    /** @hidden @internal */
     public _forEachNode(fn: (node: Node, level: number) => void, level: number) {
         fn(this, level);
         level++;
@@ -130,7 +116,6 @@ abstract class Node {
         });
     }
 
-    /** @hidden @internal */
     public _setVisible(visible: boolean) {
         if (visible !== this._visible) {
             this._fireEvent("visibility", { visible });
@@ -138,42 +123,34 @@ abstract class Node {
         }
     }
 
-    /** @hidden @internal */
     public _getDrawChildren(): Node[] | undefined {
         return this._children;
     }
 
-    /** @hidden @internal */
     public _setParent(parent: Node) {
         this._parent = parent;
     }
 
-    /** @hidden @internal */
     public _setRect(rect: Rect) {
         this._rect = rect;
     }
 
-    /** @hidden @internal */
     public _setWeight(weight: number) {
         this._attributes.weight = weight;
     }
 
-    /** @hidden @internal */
     public _setSelected(index: number) {
         this._attributes.selected = index;
     }
 
-    /** @hidden @internal */
     public _isFixed() {
         return this._fixed;
     }
 
-    /** @hidden @internal */
     public _layout(rect: Rect) {
         this._rect = rect;
     }
 
-    /** @hidden @internal */
     public _findDropTargetNode(dragNode: (Node & IDraggable), x: number, y: number): DropInfo | undefined {
         let rtn: DropInfo | undefined;
         if (this._rect.contains(x, y)) {
@@ -191,12 +168,10 @@ abstract class Node {
         return rtn;
     }
 
-    /** @hidden @internal */
     public canDrop(dragNode: (Node & IDraggable), x: number, y: number): DropInfo | undefined {
         return undefined;
     }
 
-    /** @hidden @internal */
     public _canDockInto(dragNode: (Node & IDraggable), dropInfo: DropInfo | undefined): boolean {
         if (dropInfo !== undefined) {
             if (dropInfo.location === DockLocation.CENTER && dropInfo.node.isEnableDrop() === false) {
@@ -223,7 +198,6 @@ abstract class Node {
         return true;
     }
 
-    /** @hidden @internal */
     public _removeChild(childNode: Node) {
         const pos = this._children.indexOf(childNode);
         if (pos !== -1) {
@@ -233,7 +207,6 @@ abstract class Node {
         return pos;
     }
 
-    /** @hidden @internal */
     public _addChild(childNode: Node, pos?: number) {
         if (pos !== undefined) {
             this._children.splice(pos, 0, childNode);
@@ -246,49 +219,39 @@ abstract class Node {
         return pos;
     }
 
-    /** @hidden @internal */
     public _removeAll() {
         this._children = [];
         this._dirty = true;
     }
 
-    /** @hidden @internal */
-    public _styleWithPosition(style?: Dictionary<any>) {
+    public _styleWithPosition(style?: CSSProperties): CSSProperties {
         if (style === undefined) {
             style = {};
         }
         return this._rect.styleWithPosition(style);
     }
 
-    /** @hidden @internal */
     public _getTempSize() {
         return this._tempSize;
     }
 
-    /** @hidden @internal */
     public _setTempSize(value: number) {
         this._tempSize = value;
     }
 
-    /** @hidden @internal */
     public isEnableDivide() {
         return true;
     }
 
-    /** @hidden @internal */
     public _toAttributeString() {
         return JSON.stringify(this._attributes, undefined, "\t");
     }
 
     // implemented by subclasses
-    /** @hidden @internal */
     public abstract _updateAttrs(json: any): void;
-    /** @hidden @internal */
     public abstract _getAttributeDefinitions(): AttributeDefinitions;
-    /** @hidden @internal */
     public abstract _toJson(): any;
 
-    /** @hidden @internal */
     protected _getAttributeAsStringOrUndefined(attr: string) {
         const value = this._attributes[attr];
         if (value !== undefined) {
@@ -297,7 +260,6 @@ abstract class Node {
         return undefined;
     }
 
-    /** @hidden @internal */
     protected _getAttributeAsNumberOrUndefined(attr: string) {
         const value = this._attributes[attr];
         if (value !== undefined) {
