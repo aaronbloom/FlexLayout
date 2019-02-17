@@ -1,0 +1,16 @@
+{
+    "extends": [
+        "tslint:latest",
+        "tslint-react",
+        "tslint-sonarts"
+    ],
+    "jsRules": {},
+    "rules": {
+        "variable-name": [true, "ban-keywords", "check-format", "allow-pascal-case", "allow-leading-underscore"],
+        "interface-name": false,
+        "no-empty-interface": false,
+        "no-duplicate-string": false,
+        "object-literal-sort-keys": false
+    },
+    "rulesDirectory": []
+}
